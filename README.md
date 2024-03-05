@@ -2,6 +2,8 @@
 
 **ATTENTION**: Please read the [LICENSE](./LICENSE) file before accessing or using the contents of this repository.
 
+Please also refer to the training course [INTRODUCTION](./INTRODUCTION.md) in Chinese.
+
 ## Description
 
 This repository contains the code and data for the training of the data science and engineering graduates.
