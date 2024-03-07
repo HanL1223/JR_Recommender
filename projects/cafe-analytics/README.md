@@ -1,22 +1,28 @@
 # Cafe Sales Analytics
 
-**ATTENTION**: Never push any credentials or sensitive information to the repository. Always use environment variables or other secure methods to store sensitive information. When using Jupyter Notebooks, make sure to clear the output before pushing the notebook to the repository.
+**Data Security**: Remember to avoid pushing sensitive information to public repositories. Use environment variables or secure methods for storing credentials. Clear notebook outputs before sharing.
 
 ## Project Description
 
-This project aims to conduct sales analysis for a cafe. The data is provided in Google BigQuery and the analysis is performed using SQL and Python.
+This project entails analyzing cafe sales data stored in Google BigQuery using SQL and Python. The analysis aims to:
 
-Expected outcomes of the project include:
+- **Understand sales trends**: Analyze revenue, order value, peak hours, and popular days.
+- **Examine product performance**: Identify best-selling items, average order size, and pricing trends.
+- **Gain customer insights**: Track customer acquisition, retention, lifetime value, and order patterns.
+- **Develop actionable recommendations**: Suggest strategies to boost revenue, customer retention, and optimize operations.
 
-- A blog post or report detailing the findings of the analysis.
-- A presentation summarizing the findings of the analysis to the stakeholders.
-- A updated resume section detailing the project outcomes and the skills used.
+**Expected Deliverables:**
 
-## Environemtn Setup
+- Jupyter notebook containing analysis code.
+- Presentation for stakeholders summarizing findings.
+- Public blog post or report detailing insights and value.
+- Updated resume section showcasing project outcomes and skills.
+
+## Environment Setup
 
 ### Prerequisites
 
-1. Make sure Python is installed on your computer. You can download and install Python from the official website: [Python Downloads](https://www.python.org/downloads/).
+Ensure Python is installed on your computer. You can download and install Python from the [official website](https://www.python.org/downloads/).
 
 ### Install Required Libraries
 
@@ -30,28 +36,122 @@ Expected outcomes of the project include:
 ### Set Up Google Cloud Platform (GCP) Credentials
 
 1. If you don't already have a Google Cloud Platform (GCP) account, you'll need to create one. Visit [Google Cloud Platform](https://cloud.google.com/) to sign up.
-2. Create a new project or use an existing one. (Please note that you may incur charges for using GCP services, so make sure to review the pricing information.)
-3. Enable the BigQuery API for your project. You can do this from the GCP Console under APIs & Services > Library.
-4. (Recommended) Set up authentication by creating a service account key. Go to IAM & Admin > Service accounts, select your service account or create a new one, and then create a new key in JSON format. Save this JSON file securely on your computer.
-   - Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to the location of your service account key JSON file. You can do this by running the following command in the terminal or command prompt:
+2. Create a new project or use an existing one. (Note: You may incur charges for using GCP services, so review pricing information.)
+3. Enable the BigQuery API for your project. Access this from the GCP Console under APIs & Services > Library.
+4. (Recommended) Set up authentication by creating a service account key. Navigate to IAM & Admin > Service accounts, select your service account or create a new one, and then create a new key in JSON format. Securely save this JSON file on your computer.
+   - Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to the location of your service account key JSON file. Run the following command in the terminal or command prompt:
 
        ```bash
        export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/service-account-key.json"
        ```
 
        Replace "/path/to/your/service-account-key.json" with the actual path to your service account key JSON file.
-5. (Easier Solution, not recommended for production) Use the `gcloud` command-line tool to authenticate. Run the following command in the terminal or command prompt:
+5. (Easier Solution, not recommended for production) Use the `gcloud` command-line tool to authenticate. Execute the following command in the terminal or command prompt:
 
     ```bash
     gcloud auth application-default login
     ```
 
-    This will open a browser window asking you to log in to your GCP account. After logging in, you will be authenticated and the credentials will be stored on your computer.
+    This action will prompt a browser window to log in to your GCP account. After logging in, your credentials will be authenticated and stored on your computer.
 
-### Run the demo Python notebook
+### Run the Demo Python Notebook
 
 1. Open the `demo.ipynb` notebook in Jupyter Notebook.
-2. Run the cells in the notebook to see the demo of the cafe sales analytics.
-3. Make sure to clear the output before pushing the notebook to the repository.
+2. Execute the cells in the notebook to view the cafe sales analytics demo.
+3. Ensure to clear the output before pushing the notebook to the repository.
 
 Congratulations! You have successfully executed the Python code to query data from Google BigQuery on your new computer.
+
+## Problems Statement
+
+### Data Description
+
+The cafe sales data is provided in Google BigQuery, containing the following columns available since May 2019:
+
+- `order_id`: Unique identifier for each order.
+- `customer_id`: Unique identifier for each customer.
+- `ip_addr`: IP address of the customer when placing the order (hashed for privacy).
+- `date_created`: Date and time when the order was created.
+- `date_paid`: Date and time when the order was paid.
+- `total`: Total amount of the order, in cents.
+- `status`: Status of the order (e.g., pending, paid, refunded). `2` indicates a successful order.
+- `items`: JSON array containing details of the items in the order.
+
+### Questions
+
+#### Descriptive Analysis
+
+##### Revenue Trend
+
+1. Monthly revenue trend analysis.
+2. Average order value examination.
+3. Identification of peak revenue hours.
+4. Determining the most profitable day of the week.
+5. Evaluation of the average revenue per customer.
+
+##### Product Analysis
+
+1. Identification of the top 5 best-selling items.
+2. Calculation of the average number of items per order.
+3. Determination of the average price per item.
+4. Examination of the relationship between average price per item and average quantity sold per item.
+5. Comparison of the average price per item between new and existing items
+
+##### Customer Analysis
+
+1. Monthly acquisition of new customers.
+2. Calculation of customer retention rate.
+3. Assessment of average customer lifetime value.
+4. Determination of the average time between orders.
+5. Evaluation of the average number of orders per customer.
+6. Comparison of average order value for new customers versus returning customers.
+7. Analysis of the average time between orders for new customers versus returning customers.
+
+#### Predictive Analysis
+
+1. Predictive modeling for daily revenue.
+2. Forecasting the number of new customers each month.
+3. Prediction of customer retention rate based on the first order.
+4. Forecasting average customer lifetime value based on purchase history.
+
+#### Prescriptive Analysis
+
+1. Recommendations to enhance the cafe's revenue.
+2. Strategies to improve customer retention at the cafe.
+3. Measures to increase the average customer lifetime value.
+4. Suggestions for optimizing the cafe's opening hours.
+5. Recommendations for enhancing the cafe's menu offerings.
+
+### Deliverables
+
+0. A Jupyter notebook containing SQL and Python code for the analysis.
+1. A presentation summarizing the analysis findings to stakeholders.
+2. A blog post or report detailing the analysis findings and value to the public.
+3. An updated resume section detailing project outcomes and skills used.
+
+## Recommended Workflow
+
+1. **Data Collection**: Extract data from Google BigQuery using SQL.
+2. **Data Exploration**: Explore data using Python and Pandas, understand data types and structure, and identify any missing or inconsistent data.
+3. **Data Cleaning**: Clean data by handling missing or inconsistent data, and convert data types if necessary.
+4. **Data Preprocessing**: Preprocess data by transforming data types, normalizing data, and creating new features if necessary. For example, build a product table from the `items` column, and a customer table from the `customer_id` column.
+5. **Descriptive Analysis**: Conduct descriptive analysis to answer questions about revenue trend, product analysis, and customer analysis.
+6. **Predictive Analysis**: Conduct predictive analysis to predict daily revenue, number of new customers, customer retention rate, and average customer lifetime value.
+7. **Prescriptive Analysis**: Conduct prescriptive analysis to provide recommendations for increasing revenue, customer retention rate, and average customer lifetime value, and for optimizing opening hours and menu.
+8. **Code Review**: Review SQL and Python code with peers and provide feedback.
+9. **Presentation**: Summarize analysis findings in a presentation to stakeholders.
+10. **Blog Post or Report**: Detail analysis findings and value in a blog post or report to the public.
+11. **Resume Update**: Update resume section detailing project outcomes and skills used.
+12. **Project Review**: Review project with peers and provide feedback.
+13. **Project Showcase**: Showcase project to the public and potential employers.
+14. **Project Retrospective**: Reflect on the project and identify areas for improvement.
+
+## Resources
+
+- [Growth Share Matrix](https://www.bcg.com/about/overview/our-history/growth-share-matrix)
+- [Customer Churn Rate](https://www.zendesk.com/au/blog/customer-churn-rate/)
+- [RFM Analysis](https://www.optimove.com/resources/learning-center/rfm-segmentation)
+- [Customer Lifetime Value](https://www.shopify.com/encyclopedia/customer-lifetime-value-clv)
+- [Predictive Analytics](https://www.ibm.com/cloud/learn/predictive-analytics)
+- [Prescriptive Analytics](https://www.ibm.com/cloud/learn/prescriptive-analytics)
+- [Prophet](https://facebook.github.io/prophet/)

@@ -12,6 +12,12 @@ terraform {
   }
 }
 
+# cloud storage for raw data
+resource "google_storage_bucket" "raw_data" {
+    name = "jr-data-training-raw-data"
+    location = "australia-southeast1"
+}
+
 # create an IAM Role, for all trainees
 resource "google_project_iam_custom_role" "trainee" {
   role_id     = "JRTrainee"
