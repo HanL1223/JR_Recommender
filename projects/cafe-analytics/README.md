@@ -30,7 +30,7 @@ Ensure Python is installed on your computer. You can download and install Python
 2. Use pip, Python's package installer, to install the required libraries by running the following command:
 
     ```bash
-    pip install pandas pandas-gbq matplotlib seaborn
+    pip install pandas pandas-gbq matplotlib seaborn google-auth
     ```
 
 ### Set Up Google Cloud Platform (GCP) Credentials

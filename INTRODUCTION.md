@@ -96,3 +96,21 @@
 - Sprint Retro：每个Sprint结束的最后一天，团队进行Sprint复盘会议，总结Sprint的工作过程。
 
 课程结束时进行项目总结和展示。
+
+## 开课前准备
+
+准备好日常使用的Email，用于：
+
+- 注册GCP账号
+- 注册 gitlab 账号
+- 加入 Slack 频道
+- 接受每日流程日历邀请，如每日站会、复盘等
+
+## 预期成果
+
+- 给简历增加一份[Centauri Alpha](https://www.linkedin.com/company/centauri-alpha)的项目经验
+- 给Stakeholder展示自己的项目成果
+- 在Median等博客上写一篇项目总结
+- 在Linkedin等社交媒体上展示自己的项目成果
+- 优秀成果可以发布到咨询公司 Centauri Alpha 的[官方网站](https://centaurialpha.com)和[Linkedin](https://www.linkedin.com/company/centauri-alpha)上
+- 在面试中能够谈论自己的数据分析项目经验
