@@ -139,12 +139,12 @@ The cafe sales data is provided in Google BigQuery, containing the following col
 6. **Predictive Analysis**: Conduct predictive analysis to predict daily revenue, number of new customers, customer retention rate, and average customer lifetime value.
 7. **Prescriptive Analysis**: Conduct prescriptive analysis to provide recommendations for increasing revenue, customer retention rate, and average customer lifetime value, and for optimizing opening hours and menu.
 8. **Code Review**: Review SQL and Python code with peers and provide feedback.
-9. **Presentation**: Summarize analysis findings in a presentation to stakeholders.
-10. **Blog Post or Report**: Detail analysis findings and value in a blog post or report to the public.
-11. **Resume Update**: Update resume section detailing project outcomes and skills used.
-12. **Project Review**: Review project with peers and provide feedback.
-13. **Project Showcase**: Showcase project to the public and potential employers.
-14. **Project Retrospective**: Reflect on the project and identify areas for improvement.
+9. **Blog Post or Report**: Detail analysis findings and value in a blog post or report to the public.
+10. **Wrap up**
+    1. **Resume Update**: Update resume section detailing project outcomes and skills used.
+    2. **Project Review**: Review project with peers and provide feedback.
+    3. **Project Showcase**: Showcase project to the public and potential employers.
+    4. **Project Retrospective**: Reflect on the project and identify areas for improvement.
 
 ## Resources
 
