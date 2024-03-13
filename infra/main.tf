@@ -30,6 +30,8 @@ resource "google_project_iam_custom_role" "trainee" {
     "bigquery.tables.list",
     "bigquery.tables.get",
     "bigquery.tables.export",
+    # job creation
+    "bigquery.jobs.create",
   ]
 }
 
@@ -37,6 +39,8 @@ resource "google_project_iam_custom_role" "trainee" {
 variable "trainees" {
   type = list(string)
   default = [
+    "serviceAccount:jr-data-training-sa@jr-data-training.iam.gserviceaccount.com",
+    # "user:"
   ]
 }
 
@@ -46,6 +50,6 @@ resource "google_project_iam_member" "trainee" {
   project  = "jr-data-training"
   role     = google_project_iam_custom_role.trainee.id
   for_each = toset(var.trainees)
-  member   = "user:${each.value}"
+  member   = "${each.value}"
 }
 
