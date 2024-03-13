@@ -41,7 +41,7 @@ variable "trainees" {
   default = [
     "serviceAccount:jr-data-training-sa@jr-data-training.iam.gserviceaccount.com",
     "user:gytang26@gmail.com",
-    "user:nicole99144@gmail.com",
+    "user:liangnic@hotmail.com",
   ]
 }
 
