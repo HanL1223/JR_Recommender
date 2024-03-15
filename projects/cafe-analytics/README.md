@@ -54,6 +54,69 @@ Ensure Python is installed on your computer. You can download and install Python
 
     This action will prompt a browser window to log in to your GCP account. After logging in, your credentials will be authenticated and stored on your computer.
 
+### How to Install GCloud and Ensure It Always Works After Restart on Mac OS High Sierra
+
+If you're using Visual Studio Code as your IDE and need GCP authentication, you might encounter the "gcloud not found" command. Follow these steps to install GCloud and ensure it always works after restarting your Mac OS High Sierra:
+
+1. **Download the install package**:
+   - [Download the Google Cloud SDK install package](<https://cloud.google.com/sdk/docs/install-sdk>).
+
+2. **Extract the package**:
+   - After downloading the package, extract the contents and drop them into a folder of your choice.
+
+3. **Open Terminal**:
+   - Open Terminal and navigate to the folder where you placed the extracted files.
+
+4. **Run the installation script**:
+   - In the Terminal, execute the following command:
+     ```bash
+     ./google-cloud-sdk/install.sh
+     ```
+
+5. **Modify profile**:
+   - When prompted, select "Yes" to modify your profile and update your `$PATH` to enable bash completion.
+
+6. **Enter the path to modify**:
+   - Enter the path to modify, typically:
+     ```
+     /Users/USERNAME_COMPUTER/.bashrc
+     ```
+
+7. **Source the profile**:
+   - After the installation completes, enter the following command:
+     ```bash
+     source ~/.bashrc
+     ```
+
+8. **Verify the installation**:
+   - Check if GCloud is installed properly by entering:
+     ```bash
+     gcloud --version
+     ```
+
+9. **Open a new Terminal window**:
+   - Do not close the old Terminal window. Open a new one (Cmd + N) and enter:
+     ```bash
+     gcloud --version
+     ```
+
+10. **Verify GCloud is working**:
+    - If you still see "command not found," proceed to step 11. Otherwise, congratulations, GCloud is working in Terminal.
+
+11. **Update your PATH in BASH_PROFILE**:
+    - Open the BASH_PROFILE file by entering the following command:
+      ```bash
+      open ~/.bash_profile
+      ```
+    - Add the following line to the file:
+      ```
+      export PATH="/Users/USERNAME_COMPUTER/google-cloud-sdk/bin:$PATH"
+      ```
+    - Save the changes and return to step 8.
+
+Follow these steps carefully to install GCloud and ensure it works seamlessly with your Visual Studio Code setup on Mac OS High Sierra.
+
+
 ### Run the Demo Python Notebook
 
 1. Open the `demo.ipynb` notebook in Jupyter Notebook.
