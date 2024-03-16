@@ -69,6 +69,7 @@ If you're using Visual Studio Code as your IDE and need GCP authentication, you 
 
 4. **Run the installation script**:
    - In the Terminal, execute the following command:
+
      ```bash
      ./google-cloud-sdk/install.sh
      ```
@@ -78,24 +79,28 @@ If you're using Visual Studio Code as your IDE and need GCP authentication, you 
 
 6. **Enter the path to modify**:
    - Enter the path to modify, typically:
+
      ```
      /Users/USERNAME_COMPUTER/.bashrc
      ```
 
 7. **Source the profile**:
    - After the installation completes, enter the following command:
+
      ```bash
      source ~/.bashrc
      ```
 
 8. **Verify the installation**:
    - Check if GCloud is installed properly by entering:
+
      ```bash
      gcloud --version
      ```
 
 9. **Open a new Terminal window**:
    - Do not close the old Terminal window. Open a new one (Cmd + N) and enter:
+
      ```bash
      gcloud --version
      ```
@@ -105,17 +110,20 @@ If you're using Visual Studio Code as your IDE and need GCP authentication, you 
 
 11. **Update your PATH in BASH_PROFILE**:
     - Open the BASH_PROFILE file by entering the following command:
+
       ```bash
       open ~/.bash_profile
       ```
+
     - Add the following line to the file:
+
       ```
       export PATH="/Users/USERNAME_COMPUTER/google-cloud-sdk/bin:$PATH"
       ```
+
     - Save the changes and return to step 8.
 
 Follow these steps carefully to install GCloud and ensure it works seamlessly with your Visual Studio Code setup on Mac OS High Sierra.
-
 
 ### Run the Demo Python Notebook
 
@@ -126,6 +134,10 @@ Follow these steps carefully to install GCloud and ensure it works seamlessly wi
 Congratulations! You have successfully executed the Python code to query data from Google BigQuery on your new computer.
 
 ## Problems Statement
+
+The key problems to address in this project are:
+
+- What is values your analytic report can bring to your stakeholders (i.e. the Cafe’s owner)
 
 ### Data Description
 

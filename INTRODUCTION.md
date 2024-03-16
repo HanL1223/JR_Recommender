@@ -83,10 +83,10 @@
 
 课程以标准的Scrum模式开展，每两周为一个Sprint，课程一共4个Sprint。
 
-- Week 1-2: Sprint 1
-- Week 3-4: Sprint 2
-- Week 5-6: Sprint 3
-- Week 7-8: Sprint 4
+- Week 1-2: Sprint 1, 完成基本数据准备和数据探索，明确研究问题
+- Week 3-4: Sprint 2, 开展数据分析和建模，完成初步分析，获取初步结论
+- Week 5-6: Sprint 3, 完成所有必要的分析和建模，确定最终结论
+- Week 7-8: Sprint 4, 项目总结和展示
 
 每个2周/10天的sprint周期内包含以下固定的仪式：
 
@@ -94,6 +94,8 @@
 - Daily Scrum Meeting：团队进行每日站会，汇报工作进度和遇到的问题。
 - Sprint Review：每个Sprint结束的前一天，团队进行Sprint回顾、Demo、评审，总结Sprint的工作成果。
 - Sprint Retro：每个Sprint结束的最后一天，团队进行Sprint复盘会议，总结Sprint的工作过程。
+
+此外，每个Sprint周期内，学生与教师进行一次1对1的catch-up，讨论学生的学习进度、遇到的问题，同时进行职业规划和技术指导。
 
 课程结束时进行项目总结和展示。
 
