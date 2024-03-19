@@ -35,6 +35,10 @@ resource "google_project_iam_custom_role" "trainee" {
     "bigquery.tables.updateData",
     "bigquery.tables.update",
     "bigquery.tables.delete",
+    # able to update dataset, for dbt / data engineer
+    "bigquery.datasets.update",
+    "bigquery.datasets.delete",
+    "bigquery.datasets.create",
     # job creation
     "bigquery.jobs.create",
   ]
