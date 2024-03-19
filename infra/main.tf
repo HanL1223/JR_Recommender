@@ -47,6 +47,8 @@ variable "trainees" {
     "serviceAccount:jr-data-training-sa@jr-data-training.iam.gserviceaccount.com",
     "user:gytang26@gmail.com",
     "user:liangnic@hotmail.com",
+    # Clement's service account
+    "serviceAccount:jiangren-clement@instant-heading-339309.iam.gserviceaccount.com",
   ]
 }
 
