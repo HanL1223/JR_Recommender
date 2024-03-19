@@ -30,6 +30,11 @@ resource "google_project_iam_custom_role" "trainee" {
     "bigquery.tables.list",
     "bigquery.tables.get",
     "bigquery.tables.export",
+    # able to create tables
+    "bigquery.tables.create",
+    "bigquery.tables.updateData",
+    "bigquery.tables.update",
+    "bigquery.tables.delete",
     # job creation
     "bigquery.jobs.create",
   ]
