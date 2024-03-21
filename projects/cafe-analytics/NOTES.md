@@ -1,63 +1,9 @@
-**Guide to SQL Query**
-- Finding orders at after hours but ask for order "ASAP(As Soon As Possible)" with transaction status successed -> [LINK](Query/After_hours_ASAP_order.sql)
+## **Current Step for RFM Analysis 💻**
+
+- [x] Create Recency Frequency Monetary (RFM) table
+- [x] Pre-processing(Data transformation)
+- [ ] Make segmentation from the data(K-means)
+- [ ] Interpret the result, define quartiles for RFM score
+- [ ] Conclusion & Action to take for the customers
 
 
-**Open Hours JSON format**
-```
-$_OPENING_HOURS = array(
-        '2022-01-07' => [null,null,"Christmas Break"],
-        '2022-01-26' => [700,1400,"Australia Day"],
-        '2022-03-14' => [700,1400,"Labour Day"],
-        '2022-04-15' => [700,1400,"Good Friday"],
-        '2022-04-16' => [700,1400,"Easter Saturday"],
-        '2022-04-17' => [700,1400,"Easter Sunday"],
-        '2022-04-18' => [700,1400,"Easter Monday"],
-        '2022-04-25' => [700,1400,"ANZAC Day"],
-        '2022-06-13' => [700,1400,"Queen's Birthday"],
-        '2022-07-13' => [null,null,"Closed"],
-        '2022-09-22' => [700,1400,"National Day of Mourning"],
-        '2022-09-23' => [700,1400,"Day before Grand Final Day"],
-        '2022-11-01' => [700,1400,"Melbourne Cup"],
-        '2022-12-24' => [700,1400,"Christmas Eve"],
-        '2022-12-25' => [null,null,"Christmas Break"],
-        '2022-12-26' => [null,null,"Christmas Break"],
-        '2022-12-27' => [null,null,"Christmas Break"],
-        '2022-12-28' => [null,null,"Christmas Break"],
-        '2022-12-29' => [null,null,"Christmas Break"],
-        '2022-12-30' => [null,null,"Christmas Break"],
-        '2022-12-31' => [null,null,"Christmas Break"],
-        '2023-01-01' => [null,null,"Christmas Break"],
-        '2023-01-02' => [null,null,"Christmas Break"],
-        '2023-01-03' => [null,null,"Christmas Break"],
-        '2023-01-04' => [null,null,"Christmas Break"],
-        '2023-01-26' => [700,1400,"Australia Day"],
-        '2023-03-13' => [700,1400,"Labour Day"],
-        '2023-04-07' => [700,1400,"Good Friday"],
-        '2023-04-08' => [700,1400,"Easter Saturday"],
-        '2023-04-09' => [700,1400,"Easter Sunday"],
-        '2023-04-10' => [700,1400,"Easter Monday"],
-        '2023-04-25' => [700,1400,"ANZAC Day"],
-        '2023-12-24' => [700,1400,"Christmas Eve"],
-        '2023-12-25' => [null,null,"Christmas Break"],
-        '2023-12-26' => [null,null,"Christmas Break"],
-        '2023-12-27' => [null,null,"Christmas Break"],
-        '2023-12-28' => [null,null,"Christmas Break"],
-        '2023-12-29' => [null,null,"Christmas Break"],
-        '2023-12-30' => [null,null,"Christmas Break"],
-        '2023-12-31' => [null,null,"Christmas Break"],
-        '2024-01-01' => [null,null,"Christmas Break"],
-        '2024-01-02' => [null,null,"Christmas Break"],
-        '2024-01-03' => [null,null,"Christmas Break"],
-        '2024-01-26' => [700,1400,"Australia Day"],
-        '2024-03-11' => [700,1400,"Labour Day"],
-        'normal' => array(
-                'MON' => [600,1600],
-                'TUE' => [600,1600],
-                'WED' => [600,1600],
-                'THU' => [600,1600],
-                'FRI' => [600,1600],
-                'SAT' => [700,1600],
-                'SUN' => [700,1600],
-        ),
-);
-```
