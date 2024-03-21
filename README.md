@@ -73,8 +73,13 @@ If you are interested in web-based visualisation, you might want to get familiar
 - [ECharts](https://echarts.apache.org/)
 - [D3.js](https://d3js.org/)
 
+## Contributing Guidelines
+
+Please read the [CONTRIBUTING](./CONTRIBUTING.md) file for details.
+
 ***
 
 ## License
 
 Please read the [LICENSE](./LICENSE) file for details.
+

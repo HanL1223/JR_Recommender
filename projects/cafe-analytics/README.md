@@ -54,6 +54,77 @@ Ensure Python is installed on your computer. You can download and install Python
 
     This action will prompt a browser window to log in to your GCP account. After logging in, your credentials will be authenticated and stored on your computer.
 
+### How to Install GCloud and Ensure It Always Works After Restart on Mac OS High Sierra
+
+If you're using Visual Studio Code as your IDE and need GCP authentication, you might encounter the "gcloud not found" command. Follow these steps to install GCloud and ensure it always works after restarting your Mac OS High Sierra:
+
+1. **Download the install package**:
+   - [Download the Google Cloud SDK install package](<https://cloud.google.com/sdk/docs/install-sdk>).
+
+2. **Extract the package**:
+   - After downloading the package, extract the contents and drop them into a folder of your choice.
+
+3. **Open Terminal**:
+   - Open Terminal and navigate to the folder where you placed the extracted files.
+
+4. **Run the installation script**:
+   - In the Terminal, execute the following command:
+
+     ```bash
+     ./google-cloud-sdk/install.sh
+     ```
+
+5. **Modify profile**:
+   - When prompted, select "Yes" to modify your profile and update your `$PATH` to enable bash completion.
+
+6. **Enter the path to modify**:
+   - Enter the path to modify, typically:
+
+     ```
+     /Users/USERNAME_COMPUTER/.bashrc
+     ```
+
+7. **Source the profile**:
+   - After the installation completes, enter the following command:
+
+     ```bash
+     source ~/.bashrc
+     ```
+
+8. **Verify the installation**:
+   - Check if GCloud is installed properly by entering:
+
+     ```bash
+     gcloud --version
+     ```
+
+9. **Open a new Terminal window**:
+   - Do not close the old Terminal window. Open a new one (Cmd + N) and enter:
+
+     ```bash
+     gcloud --version
+     ```
+
+10. **Verify GCloud is working**:
+    - If you still see "command not found," proceed to step 11. Otherwise, congratulations, GCloud is working in Terminal.
+
+11. **Update your PATH in BASH_PROFILE**:
+    - Open the BASH_PROFILE file by entering the following command:
+
+      ```bash
+      open ~/.bash_profile
+      ```
+
+    - Add the following line to the file:
+
+      ```
+      export PATH="/Users/USERNAME_COMPUTER/google-cloud-sdk/bin:$PATH"
+      ```
+
+    - Save the changes and return to step 8.
+
+Follow these steps carefully to install GCloud and ensure it works seamlessly with your Visual Studio Code setup on Mac OS High Sierra.
+
 ### Run the Demo Python Notebook
 
 1. Open the `demo.ipynb` notebook in Jupyter Notebook.
@@ -63,6 +134,10 @@ Ensure Python is installed on your computer. You can download and install Python
 Congratulations! You have successfully executed the Python code to query data from Google BigQuery on your new computer.
 
 ## Problems Statement
+
+The key problems to address in this project are:
+
+- What is values your analytic report can bring to your stakeholders (i.e. the Cafe’s owner)
 
 ### Data Description
 
@@ -139,12 +214,12 @@ The cafe sales data is provided in Google BigQuery, containing the following col
 6. **Predictive Analysis**: Conduct predictive analysis to predict daily revenue, number of new customers, customer retention rate, and average customer lifetime value.
 7. **Prescriptive Analysis**: Conduct prescriptive analysis to provide recommendations for increasing revenue, customer retention rate, and average customer lifetime value, and for optimizing opening hours and menu.
 8. **Code Review**: Review SQL and Python code with peers and provide feedback.
-9. **Presentation**: Summarize analysis findings in a presentation to stakeholders.
-10. **Blog Post or Report**: Detail analysis findings and value in a blog post or report to the public.
-11. **Resume Update**: Update resume section detailing project outcomes and skills used.
-12. **Project Review**: Review project with peers and provide feedback.
-13. **Project Showcase**: Showcase project to the public and potential employers.
-14. **Project Retrospective**: Reflect on the project and identify areas for improvement.
+9. **Blog Post or Report**: Detail analysis findings and value in a blog post or report to the public.
+10. **Wrap up**
+    1. **Resume Update**: Update resume section detailing project outcomes and skills used.
+    2. **Project Review**: Review project with peers and provide feedback.
+    3. **Project Showcase**: Showcase project to the public and potential employers.
+    4. **Project Retrospective**: Reflect on the project and identify areas for improvement.
 
 ## Resources
 

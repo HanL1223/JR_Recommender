@@ -30,6 +30,15 @@ resource "google_project_iam_custom_role" "trainee" {
     "bigquery.tables.list",
     "bigquery.tables.get",
     "bigquery.tables.export",
+    # able to create tables
+    "bigquery.tables.create",
+    "bigquery.tables.updateData",
+    "bigquery.tables.update",
+    "bigquery.tables.delete",
+    # able to update dataset, for dbt / data engineer
+    "bigquery.datasets.update",
+    "bigquery.datasets.delete",
+    "bigquery.datasets.create",
     # job creation
     "bigquery.jobs.create",
   ]
@@ -40,7 +49,10 @@ variable "trainees" {
   type = list(string)
   default = [
     "serviceAccount:jr-data-training-sa@jr-data-training.iam.gserviceaccount.com",
-    # "user:"
+    "user:gytang26@gmail.com",
+    "user:liangnic@hotmail.com",
+    # Clement's service account
+    "serviceAccount:jiangren-clement@instant-heading-339309.iam.gserviceaccount.com",
   ]
 }
 
