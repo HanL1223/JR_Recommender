@@ -31,4 +31,4 @@ with
     )
 
 select *
-from parsed_items
+from final_result
