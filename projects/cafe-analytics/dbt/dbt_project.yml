@@ -1,7 +1,7 @@
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
-name: "Cafe_Analytics"
+name: "CafeAnalytics"
 version: "1.0.0"
 config-version: 2
 
@@ -30,13 +30,13 @@ clean-targets: # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   cafe_analytics:
-    staging:
+    stg:
       materialized: view
       tags: ["staging"]
-    transformation:
+    transform:
       materialized: table
       tags: ["transformation"]
-    cafe_analytics:
+    marts:
       materialized: table
       tags: ["cafe_analytics"]
 

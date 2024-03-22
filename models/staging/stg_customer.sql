@@ -1,0 +1,1 @@
+-- where you prepare the customer data from your source tables.
