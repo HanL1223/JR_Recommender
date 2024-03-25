@@ -31,4 +31,5 @@ with
     )
 
 select *
-from parsed_items
+from final_result  -- Use final_result CTE instead of parsed_items
+

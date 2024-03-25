@@ -4,14 +4,10 @@ with
     unpacked_items as (
         select
             order_id,
-            cast(json_extract_path_text(items, 'cart_size') as integer) as cart_size,
+            cast(json_extract(items, '$.cart_size') as int64) as cart_size,
+            cast(json_extract(items, '$.cart_surcharge') as float64) as cart_surcharge,
             cast(
-                json_extract_path_text(items, 'cart_surcharge') as decimal(10, 2)
-            ) as cart_surcharge,
-            cast(
-                json_extract_path_text(items, 'cart_total_before_discounts') as decimal(
-                    10, 2
-                )
+                json_extract(items, '$.cart_total_before_discounts') as float64
             ) as total_before_discounts
         from raw_data
     )
