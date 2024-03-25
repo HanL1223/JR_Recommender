@@ -32,10 +32,10 @@ clean-targets: # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   analytics:
-    materialized: view
+    materialized: table
     tags: ["analytics"]
   staging:
-    materialized: view
+    materialized: table
     tags: ["staging"]
   transformation:
     materialized: table
