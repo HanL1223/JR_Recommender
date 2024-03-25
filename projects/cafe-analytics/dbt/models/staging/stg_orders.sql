@@ -1,4 +1,6 @@
 -- extract and preparing data in the staging layer from BigQuery
+-- select from your raw orders table. Ensure the items column is correctly handled as JSON. 
+-- include renaming columns for consistency and possibly converting string timestamps to appropriate timestamp types.
 with
     raw_orders as (
         select
