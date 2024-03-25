@@ -18,11 +18,9 @@ seed-paths: ["projects/cafe-analytics/dbt/seeds"]
 macro-paths: ["projects/cafe-analytics/dbt/macros"]
 snapshot-paths: ["projects/cafe-analytics/dbt/snapshots"]
 
-
 clean-targets: # directories to be removed by `dbt clean`
   - "projects/cafe-analytics/dbt/target"
   - "projects/cafe-analytics/dbt/dbt_packages"
-
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
@@ -30,16 +28,21 @@ clean-targets: # directories to be removed by `dbt clean`
 # In this example config, we tell dbt to build all models in the example/
 # directory as views. These settings can be overridden in the individual model
 # files using the `{{ config(...) }}` macro.
+
+
+
 models:
-  analytics:
-    materialized: table
-    tags: ["analytics"]
-  staging:
-    materialized: table
-    tags: ["staging"]
-  transformation:
-    materialized: table
-    tags: ["transformation"]
+  cafe_analytics: # This should match the name field at the top of your dbt_project.yml
+    staging:
+      +materialized: table
+      tags: ["staging"]
+    transformation:
+      +materialized: table
+      tags: ["transformation"]
+    analytics:
+      +materialized: table
+      tags: ["analytics"]
+
 
 vars:
   project_dataset: dbt_cafeanalytics
