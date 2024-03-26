@@ -1,1 +1,0 @@
--- compute daily sales, categorize orders, or calculate average order values
