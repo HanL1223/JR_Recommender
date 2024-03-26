@@ -1,9 +1,9 @@
-<<<<<<< HEAD
 -- where you prepare the orders data from your source tables.
-=======
 -- extract and preparing data in the staging layer from BigQuery
--- select from your raw orders table. Ensure the items column is correctly handled as JSON. 
--- include renaming columns for consistency and possibly converting string timestamps to appropriate timestamp types.
+-- select from your raw orders table. Ensure the items column is correctly handled as
+-- JSON.
+-- include renaming columns for consistency and possibly converting string timestamps
+-- to appropriate timestamp types.
 with
     raw_orders as (
         select
@@ -21,5 +21,3 @@ with
 select
     order_id, customer_id, ip_addr, date_created, date_paid, total, status, items_json
 from raw_orders
-
->>>>>>> feature/CA-14
