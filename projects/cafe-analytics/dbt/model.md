@@ -79,3 +79,19 @@ In the analytics folder, we have the following model:
   - `last_order_date`: TIMESTAMP, nullable
   - `visits_last_year`: INTEGER, nullable
   - `most_frequent_item`: STRING, nullable
+
+#### item_options_analysis
+- **Description:** Analytics model for item options analysis.
+- **Fields:**
+    - `item_name`: STRING, nullable
+    - `option_name`: STRING, nullable
+    - `option_value`: STRING, nullable
+    - `count`: INTEGER, nullable
+    - `avg_option_price`: FLOAT, nullable
+
+#### total_sales_by_item
+- **Description:** Analytics model for total sales by item.
+- **Fields:**
+    - `item_name`: STRING, nullable
+    - `total_sales`: FLOAT, nullable
+    - `total_orders`: INTEGER, nullable
