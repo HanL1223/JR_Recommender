@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: stg_items
+    description: "Staging table for unpacked items data."
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order."
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_customers
+    description: "Staging table for customer data."
+    columns:
+      - name: customer_id
+        description: "Unique identifier for each customer."
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_orders
+    description: "Staging table for order data."
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order."
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Identifier for the customer who made the order."
+        tests:
+          - not_null
+      - name: total
+        description: "Total amount of the order."
+        tests:
+          - not_null

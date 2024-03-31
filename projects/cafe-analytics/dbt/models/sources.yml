@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: cafe
+    database: jr-data-training
+    schema: cafe
+    tables:
+      - name: cafe-sales
