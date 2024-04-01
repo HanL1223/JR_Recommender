@@ -44,10 +44,10 @@ date,open_time,close_time,special_note
 2024-01-03,,,Christmas Break
 2024-01-26,700,1400,Australia Day
 2024-03-11,700,1400,Labour Day
-normal_MON,600,1600,
-normal_TUE,600,1600,
-normal_WED,600,1600,
-normal_THU,600,1600,
-normal_FRI,600,1600,
-normal_SAT,700,1600,
-normal_SUN,700,1600,
+normal_Monday,600,1600,
+normal_Tuesday,600,1600,
+normal_Wednesday,600,1600,
+normal_Thursday,600,1600,
+normal_Friday,600,1600,
+normal_Saturday,700,1600,
+normal_Sunday,700,1600,
