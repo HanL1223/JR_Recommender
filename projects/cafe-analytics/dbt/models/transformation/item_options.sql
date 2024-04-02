@@ -1,12 +1,10 @@
--- Extracting item options with price adjustments from cents to dollars directly from
--- stg_orders
 select
     items.order_id,
     items.item_name,
-    -- Including the item_hash_id to build the relationship
-    items.item_hash_id,
-    -- Extracting options using a cross join similar to item_details but targeting
-    -- options
+    -- Replace item_hash_id with order_item_ranking
+    concat(
+        cast(items.order_id as string), '-', cast(item_ranks.item_rank as string)
+    ) as order_item_ranking,
     cast(json_extract_scalar(option, '$.name') as string) as option_name,
     cast(json_extract_scalar(option, '$.value') as string) as option_value,
     round(
@@ -15,17 +13,14 @@ select
 from
     (
         select
-            s.order_id,
-            json_extract_scalar(cart_item, '$.name') as item_name,
-            -- Repeating the hash ID calculation as done in item_details for consistency
-            farm_fingerprint(
-                concat(
-                    json_extract_scalar(cart_item, '$.name'),
-                    json_extract_scalar(cart_item, '$.category')
-                )
-            ) as item_hash_id,
-            cart_item
+            s.order_id, json_extract_scalar(cart_item, '$.name') as item_name, cart_item
         from {{ ref("stg_orders") }} s
         cross join unnest(json_extract_array(s.items_json, '$.cart')) as cart_item
     ) as items
+-- Assuming item_ranks is a derived table or CTE that contains order_id, item_name,
+-- and item_rank
+join
+    {{ ref("item_details") }} as item_ranks
+    on items.order_id = item_ranks.order_id
+    and items.item_name = item_ranks.item_name
 cross join unnest(json_extract_array(items.cart_item, '$.options')) as option
