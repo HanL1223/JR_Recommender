@@ -2,10 +2,9 @@
 -- adjustment, including order time details, and adding a hashed ID
 select
     farm_fingerprint(
-        concat(extracted.item_name, coalesce(extracted.item_category, 'NoCategory'))
+        concat(extracted.item_name, extracted.item_category)
     ) as item_hash_id,
     extracted.*
-
 from
     (
         select
