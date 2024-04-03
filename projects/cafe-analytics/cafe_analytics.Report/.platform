@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "cafe_analytics"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "d71673c2-8386-4189-adaf-7b22a3c189b7"
+  }
+}
