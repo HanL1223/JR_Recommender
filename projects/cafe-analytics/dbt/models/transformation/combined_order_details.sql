@@ -1,7 +1,7 @@
 with
     enriched_opening_hours as (
         select actual_date, open_time, close_time, special_note
-        from `jr-data-training.dbt_cafeanalytics.stg_opening_hours`
+        from {{ ref("stg_opening_hours") }}
     ),
 
     orders_enriched_with_opening_info as (
