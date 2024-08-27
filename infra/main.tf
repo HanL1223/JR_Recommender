@@ -65,3 +65,12 @@ resource "google_project_iam_member" "trainee" {
   member   = "${each.value}"
 }
 
+# https://community.fabric.microsoft.com/t5/Service/BIgQuery-Account-Permissions/m-p/1390692
+# Assign the predefined GCP IAM role "BigQuery Read Session User" 
+# to allow the user to query the data in Power BI.
+resource "google_project_iam_member" "bigquery_read_session_user" {
+  project = "jr-data-training"
+  role = "roles/bigquery.readSessionUser"
+  for_each = toset(var.trainees)
+  member = "${each.value}"
+}
