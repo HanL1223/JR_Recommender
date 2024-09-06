@@ -14,8 +14,8 @@ terraform {
 
 # cloud storage for raw data
 resource "google_storage_bucket" "raw_data" {
-    name = "jr-data-training-raw-data"
-    location = "australia-southeast1"
+  name     = "jr-data-training-raw-data"
+  location = "australia-southeast1"
 }
 
 # create an IAM Role, for all trainees
@@ -49,28 +49,28 @@ variable "trainees" {
   type = list(string)
   default = [
     "serviceAccount:jr-data-training-sa@jr-data-training.iam.gserviceaccount.com",
-    "user:gytang26@gmail.com",
-    "user:liangnic@hotmail.com",
-    # Clement's service account
-    "serviceAccount:jiangren-clement@instant-heading-339309.iam.gserviceaccount.com",
+    "user:siacks@outlook.com",
+    "user:patrickw2022@outlook.com",
+    "user:maxinexiong2@gmail.com",
+    "user:yanleiyang447@gmail.com",
+    "user:jack042377@gmail.com",
   ]
 }
-
 
 # Grant the trainee role to the trainees xx@xx.com
 resource "google_project_iam_member" "trainee" {
   project  = "jr-data-training"
   role     = google_project_iam_custom_role.trainee.id
   for_each = toset(var.trainees)
-  member   = "${each.value}"
+  member   = each.value
 }
 
 # https://community.fabric.microsoft.com/t5/Service/BIgQuery-Account-Permissions/m-p/1390692
 # Assign the predefined GCP IAM role "BigQuery Read Session User" 
 # to allow the user to query the data in Power BI.
 resource "google_project_iam_member" "bigquery_read_session_user" {
-  project = "jr-data-training"
-  role = "roles/bigquery.readSessionUser"
+  project  = "jr-data-training"
+  role     = "roles/bigquery.readSessionUser"
   for_each = toset(var.trainees)
-  member = "${each.value}"
+  member   = each.value
 }
