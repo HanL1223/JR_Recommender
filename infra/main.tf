@@ -54,6 +54,7 @@ variable "trainees" {
     "user:maxinexiong2@gmail.com",
     "user:yanleiyang447@gmail.com",
     "user:jack042377@gmail.com",
+    "user:eric.careers268@gmail.com",
   ]
 }
 
