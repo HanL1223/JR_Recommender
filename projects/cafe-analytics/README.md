@@ -36,17 +36,8 @@ Ensure Python is installed on your computer. You can download and install Python
 ### Set Up Google Cloud Platform (GCP) Credentials
 
 1. If you don't already have a Google Cloud Platform (GCP) account, you'll need to create one. Visit [Google Cloud Platform](https://cloud.google.com/) to sign up.
-2. Create a new project or use an existing one. (Note: You may incur charges for using GCP services, so review pricing information.)
-3. Enable the BigQuery API for your project. Access this from the GCP Console under APIs & Services > Library.
-4. (Recommended) Set up authentication by creating a service account key. Navigate to IAM & Admin > Service accounts, select your service account or create a new one, and then create a new key in JSON format. Securely save this JSON file on your computer.
-   - Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to the location of your service account key JSON file. Run the following command in the terminal or command prompt:
-
-       ```bash
-       export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/service-account-key.json"
-       ```
-
-       Replace "/path/to/your/service-account-key.json" with the actual path to your service account key JSON file.
-5. (Easier Solution, not recommended for production) Use the `gcloud` command-line tool to authenticate. Execute the following command in the terminal or command prompt:
+2. Provide your account details to the project administrator to grant you access to the cafe sales data in Google BigQuery.
+3. Use the `gcloud` command-line tool to authenticate. Execute the following command in the terminal or command prompt:
 
     ```bash
     gcloud auth application-default login
