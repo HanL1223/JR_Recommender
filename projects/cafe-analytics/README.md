@@ -24,6 +24,8 @@ This project entails analyzing cafe sales data stored in Google BigQuery using S
 
 Ensure Python is installed on your computer. You can download and install Python from the [official website](https://www.python.org/downloads/).
 
+Google Cloud SDK is required to authenticate and access Google BigQuery. Follow the instructions on [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) to install it on your computer.
+
 ### Install Required Libraries
 
 1. Open a command prompt or terminal on your computer.
