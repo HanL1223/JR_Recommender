@@ -19,6 +19,7 @@ Note: It is recommended to create a JIRA ticket before starting to work on a new
 - **What to Contribute**: You can contribute to the existing projects by **adding new features**, **fixing bugs**, or **improving the documentation**.
 - **No Data Upload**: Please do not upload any actual data (such as notebooks with running results, or CSV files) to the repository. Such actions will put the **data security** at risk. As long as your code works with the data warehouse, other users can reproduce the results with the same code.
 - **No Sensitive Information**: Please do not upload any sensitive information (such as passwords, API keys, or personal information) to the repository. Such actions will put the **data security** at risk.
+- **Frequent and Small Updates**: Please make frequent and small updates to the repository in the form of commits and pull requests. Also please make sure to keep the pull requests small and focused on a single change, so that it is easier to review. For example, if you added a new line in your daily journal, you can commit and push it to the repository, and create a pull request. This will help to keep the repository up-to-date and make it easier to review the changes.
 
 ## Style Guide
 
