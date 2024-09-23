@@ -55,6 +55,7 @@ variable "trainees" {
     "user:yanleiyang447@gmail.com",
     "user:jack042377@gmail.com",
     "user:eric.careers268@gmail.com",
+    "serviceAccount:jackyan@sapient-catbird-435207-t1.iam.gserviceaccount.com",
   ]
 }
 
