@@ -14,13 +14,12 @@ Note: It is recommended to create a JIRA ticket before starting to work on a new
 6. Review the pull request and make sure all the checks are passed.
 7. Merge the pull request.
 
-## What to Contribute
+## General Guidelines
 
-You can contribute to the existing projects by **adding new features**, **fixing bugs**, or **improving the documentation**.
-
-## Code of Conduct
-
-- Please follow the [LICENSE](./LICENSE) of this repository.
+- **What to Contribute**: You can contribute to the existing projects by **adding new features**, **fixing bugs**, or **improving the documentation**.
+- **No Data Upload**: Please do not upload any actual data (such as notebooks with running results, or CSV files) to the repository. Such actions will put the **data security** at risk. As long as your code works with the data warehouse, other users can reproduce the results with the same code.
+- **No Sensitive Information**: Please do not upload any sensitive information (such as passwords, API keys, or personal information) to the repository. Such actions will put the **data security** at risk.
+- **Frequent and Small Updates**: Please make frequent and small updates to the repository in the form of commits and pull requests. Also please make sure to keep the pull requests small and focused on a single change, so that it is easier to review. For example, if you added a new line in your daily journal, you can commit and push it to the repository, and create a pull request. This will help to keep the repository up-to-date and make it easier to review the changes.
 
 ## Style Guide
 
@@ -32,3 +31,7 @@ You can contribute to the existing projects by **adding new features**, **fixing
 
 1. Please use the [Issues](https://gitlab.com/centauri-alpha/data-training/-/issues) section of this repository to report any issues.
 2. You are wellcome to create a pull request to fix the issue directly.
+
+## Code of Conduct
+
+- Please follow the [LICENSE](./LICENSE) of this repository.
