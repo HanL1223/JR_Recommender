@@ -1,0 +1,133 @@
+version: 2
+
+models:
+    - name: int_order_details_extracted
+      columns:
+        - name: order_item_id
+          tests:
+            - unique
+            - not_null
+        - name: order_item_ranking
+          tests:
+            - not_null
+        - name: item_category
+          tests:
+            - accepted_values:
+                values: [
+                    'Hot Drinks',
+                    'Food',
+                    'Cold Drinks',
+                    'Kitchen'
+                ]
+
+    - name: fct_order_details
+      columns:
+        - name: order_id
+          tests:
+            - unique
+            - not_null
+        - name: customer_id
+          tests:
+            - relationships:
+                to: ref('dim_customers')
+                field: customer_id
+        - name: status
+          tests:
+            - relationships:
+                to: ref('dim_payment_status')
+                field: status
+
+    - name: fct_product_sales
+      columns:
+        - name: order_item_id
+          tests:
+            - unique
+            - not_null
+        - name: item_name
+          tests:
+            - relationships:
+                to: ref('dim_products')
+                field: item_name
+        - name: order_id
+          tests:
+            - relationships:
+                to: ref('fct_order_details')
+                field: order_id
+
+    - name: customer_churn_threshold
+      columns:
+        - name: customer_id
+          tests:
+            - unique
+            - not_null
+            - relationships:
+                to: ref('dim_customers')
+                field: customer_id
+        - name: churn_threshold
+          tests:
+            - not_null
+
+    - name: dim_item_options
+      columns:
+        - name: item_option_id
+          tests:
+            - unique
+            - not_null
+        - name: order_item_id
+          tests:
+            - relationships:
+                to: ref('fct_product_sales')
+                field: order_item_id
+
+    - name: dim_customers
+      columns:
+        - name: customer_id
+          tests:
+            - unique
+            - not_null
+
+    - name: dim_payment_status
+      columns:
+        - name: status
+          tests:
+            - unique
+            - not_null
+        - name: status_description
+          tests:
+            - not_null
+
+    - name: dim_products
+      columns:
+        - name: item_name
+          tests:
+            - unique
+            - not_null
+        - name: item_category
+          tests:
+            - accepted_values:
+                values: [
+                    'Hot Drinks',
+                    'Food',
+                    'Cold Drinks',
+                    'Kitchen'
+                ]
+
+    - name: item_price_history
+      columns:
+        - name: item_price_id
+          tests:
+            - unique
+            - not_null
+        - name: item_name
+          tests:
+            - relationships:
+                to: ref('dim_products')
+                field: item_name
+
+    - name: dim_time
+      columns:
+        - name: date_key
+          tests:
+            - unique
+            - not_null
+        
