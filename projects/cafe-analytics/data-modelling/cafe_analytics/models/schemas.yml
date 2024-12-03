@@ -20,6 +20,31 @@ models:
                     'Kitchen'
                 ]
 
+    - name: int_order_item_options_extracted
+      columns:
+        - name: order_id
+          tests:
+            - relationships:
+                to: ref('fct_order_details')
+                field: order_id
+        - name: item_name
+          tests:
+            - relationships:
+                to: ref('dim_products')
+                field: item_name
+        - name: order_item_id
+          tests:
+            - relationships:
+                to: ref('fct_product_sales')
+                field: order_item_id 
+
+    - name: fct_order_item_options
+      columns:
+        - name: order_item_option_id
+          tests:
+            - unique
+            - not_null
+        
     - name: fct_order_details
       columns:
         - name: order_id
@@ -67,18 +92,6 @@ models:
           tests:
             - not_null
 
-    - name: dim_item_options
-      columns:
-        - name: item_option_id
-          tests:
-            - unique
-            - not_null
-        - name: order_item_id
-          tests:
-            - relationships:
-                to: ref('fct_product_sales')
-                field: order_item_id
-
     - name: dim_customers
       columns:
         - name: customer_id
@@ -112,6 +125,21 @@ models:
                     'Kitchen'
                 ]
 
+    - name: dim_item_options
+      columns:
+        - name: item_option_id
+          tests:
+            - unique
+            - not_null
+        - name: item_name
+          tests:
+            - relationships:
+                to: ref('dim_products')
+                field: item_name
+        - name: start_date
+          tests:
+            - not_null
+
     - name: item_price_history
       columns:
         - name: item_price_id
@@ -123,6 +151,9 @@ models:
             - relationships:
                 to: ref('dim_products')
                 field: item_name
+        - name: start_date
+          tests:
+            - not_null
 
     - name: dim_time
       columns:

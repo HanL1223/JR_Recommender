@@ -1,38 +1,37 @@
-with 
-
-orders_extracted as (
-    select *
-    from {{ ref('int_order_details_extracted') }}
-),
+with
 
 options_extracted as (
-    select
-        orders_extracted.order_item_id,
-        cast(
-            json_extract_scalar(item_options, '$.name') as string
-        ) as option_name,
-        cast(
-            json_extract_scalar(item_options, '$.value') as string
-        ) as option_value,
-        round(
-            cast(
-                json_extract_scalar(item_options, '$.price') as float64
-            ) / 100,
-            2
-        ) as option_price
-
-    from orders_extracted
-    cross join unnest(
-        json_extract_array(orders_extracted.cart_items, '$.options')
-    ) as item_options
+    select *
+    from {{ ref("int_order_item_options_extracted") }}
 ),
 
-options_indexed as (
+item_options as (
+    select
+        item_name,
+        option_name,
+        option_value,
+        option_price,
+        date(min(date_created)) as start_date
+    from options_extracted
+    group by 1, 2, 3, 4
+),
+
+item_options_enddates as (
+    select
+        *,
+        lead(start_date) over (
+            partition by item_name, option_name, option_value
+            order by start_date
+        ) as end_date
+    from item_options
+),
+
+item_options_indexed as (
     select
         {{ 
             dbt_utils.generate_surrogate_key(
                 [
-                    'order_item_id',
+                    'item_name',
                     'option_name',
                     'option_value',
                     'option_price'
@@ -40,10 +39,11 @@ options_indexed as (
             ) 
         }} as item_option_id,
         *
-    from options_extracted
+    from item_options_enddates
 )
 
-select * 
-from options_indexed
+select *
+from item_options_indexed
 order by 
-    order_item_id, option_name, option_value 
+    item_name, option_name desc, option_value, 
+    start_date, option_price

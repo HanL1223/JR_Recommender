@@ -1,15 +1,15 @@
 with
 
-order_details as (
+orders as (
     select *
-    from {{ ref("fct_order_details") }}
+    from {{ ref("stg_orders") }}
 ),
 
 order_date_range as (
     select 
         date(min(date_created)) as start_date,
         date(max(date_created)) as end_date
-    from order_details
+    from orders
 ),
 
 full_date_range as (
