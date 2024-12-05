@@ -1,0 +1,13 @@
+centauri_alpha:
+  outputs:
+    dev:
+      dataset: dbt_dev_mx
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      location: australia-southeast1
+      method: oauth
+      priority: interactive
+      project: jr-data-training
+      threads: 4
+      type: bigquery
+  target: dev
