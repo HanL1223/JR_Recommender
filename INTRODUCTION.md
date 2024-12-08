@@ -132,9 +132,9 @@
 
 - 访问GCP Bigquery: <https://console.cloud.google.com/bigquery?project=jr-data-training>
 - 访问JIRA：<https://guangxu.atlassian.net/jira/software/projects/CA/boards/2>
-- Gitlab: <https://gitlab.com/centauri-alpha/data-training>
+- Git仓库: <https://git.centaurialpha.com/JR-Training/data-training>
 - 加入 Slack 频道：<https://centaurialpha.slack.com>
-- 接受每日流程日历邀请，如每日站会、复盘等
+- 接受每日会议日历邀请，如每日站会、复盘等
 
 ## 预期成果
 

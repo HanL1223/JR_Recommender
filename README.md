@@ -1,6 +1,6 @@
 # Data Training
 
-**ATTENTION**: Please read the [LICENSE](./LICENSE) file before accessing or using the contents of this repository.
+> **ATTENTION**: Please read the [LICENSE](./LICENSE) file before accessing or using the contents of this repository.
 
 Please also refer to the training course [INTRODUCTION](./INTRODUCTION.md) in Chinese.
 
@@ -23,6 +23,8 @@ Please refer to the individual project README files for more details.
 - [Gitflow Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 - [Learn Git](https://docs.gitlab.com/ee/topics/git/)
 
+> **Note**: we use [git.centaurialpha.com](https://git.centaurialpha.com) for our internal git repository. It supports only HTTPS (not SSH) and requires a username and password for authentication.
+
 ### Documentation with Markdown
 
 - [Markdown Guide](https://www.markdownguide.org/)
@@ -33,6 +35,8 @@ Please refer to the individual project README files for more details.
 - Basic understanding of cloud computing and cloud services.
 - Familiarity with Google Cloud Platform (GCP) and its services, especially BigQuery.
 - [How to Create a Free Tier Account on GCP](https://www.geeksforgeeks.org/how-to-create-a-free-tier-account-on-gcp/)
+
+> **Note**: Costs of using GCP services are covered by the training program. However, any form of abuse or misuse of the services will result in immediate termination of the account. Please thoroughly read the [BigQuery On-demand compute pricing](https://cloud.google.com/bigquery/pricing) before using the service.
 
 ### SQL
 
@@ -75,11 +79,13 @@ If you are interested in web-based visualisation, you might want to get familiar
 
 ## Contributing Guidelines
 
-Please read the [CONTRIBUTING](./CONTRIBUTING.md) file for details.
+You can find most of the relevant information for this training program in this repository.
+Also you are supposed to submit your work (such as code, documentation, dashboards, etc.) to this repository.
+
+Please read the [CONTRIBUTING](./CONTRIBUTING.md) guidelines before contributing to this repository.
 
 ***
 
 ## License
 
 Please read the [LICENSE](./LICENSE) file for details.
-
