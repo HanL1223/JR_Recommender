@@ -190,6 +190,14 @@ The cafe sales data is provided in Google BigQuery, containing the following col
 4. Suggestions for optimizing the cafe's opening hours.
 5. Recommendations for enhancing the cafe's menu offerings.
 
+### Alternative Pathways
+
+The above questions are just a starting point for analytic report. You can also consider the following alternative pathways:
+
+- **BI Dashboard**: Create a business intelligence dashboard to visualize the cafe sales data that contributes valuable insights to stakeholders.
+- **Data Modelling**: Use DBT (Data Build Tool) to model important metrics and dimensions for the cafe sales data, such as daily revenue, customer lifetime value, and customer retention rate.
+- **Predictive Modelling**: Implement a predictive model using Prophet or other time series forecasting techniques to predict future revenue trends, customer behavior, and sales performance.
+
 ### Deliverables
 
 0. A Jupyter notebook containing SQL and Python code for the analysis.

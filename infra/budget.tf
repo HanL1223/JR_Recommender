@@ -59,7 +59,7 @@ resource "google_monitoring_alert_policy" "bigquery_bytes_billed" {
       }
       comparison = "COMPARISON_GT"
       duration = "0s"
-      threshold_value = 5000000000
+      threshold_value = 5000000000 # 5Gb
       trigger {
         count = 1
       }
