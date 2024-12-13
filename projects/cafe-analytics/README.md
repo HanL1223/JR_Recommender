@@ -205,6 +205,12 @@ The above questions are just a starting point for analytic report. You can also 
 2. A blog post or report detailing the analysis findings and value to the public.
 3. An updated resume section detailing project outcomes and skills used.
 
+### Past Outcomes
+
+The past outcomes of this project include:
+
+- [Enhancing Retail Online Sales Through Customer Retention Analysis](https://medium.com/@maxinexiong2/technical-deep-dive-enhancing-retail-online-sales-through-customer-retention-analysis-676cfce8f1ad)
+
 ## Recommended Workflow
 
 1. **Data Collection**: Extract data from Google BigQuery using SQL.
