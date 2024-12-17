@@ -49,13 +49,12 @@ variable "trainees" {
   type = list(string)
   default = [
     "serviceAccount:jr-data-training-sa@jr-data-training.iam.gserviceaccount.com",
-    "user:maxinexiong2@gmail.com",
-    "user:eric.careers268@gmail.com",
     "user:shenruixi3@gmail.com",
     "user:houcehugo@gmail.com",
     "user:juanningshi@gmail.com",
     "user:rosewasun@gmail.com",
     "user:ysrsarah421@gmail.com",
+    "user:jxingchen2@gmail.com",
   ]
 }
 
