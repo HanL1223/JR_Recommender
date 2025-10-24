@@ -51,11 +51,13 @@ variable "trainees" {
     "serviceAccount:jr-data-training-sa@jr-data-training.iam.gserviceaccount.com",
     "user:juanningshi@gmail.com",
     "user:maxinexiong2@gmail.com",
-    "user:alicia.jinhui.qu@gmail.com",
-    "user:ylin0034@gmail.com",
-    "user:zibozhao52@gmail.com",
-    "user:harryberlin996@gmail.com",
-    "user:laaron1223@gmail.com",
+    # --- students ---
+    "user:alicia.jinhui.qu@gmail.com", # start from 2025-10-27
+    "user:ylin0034@gmail.com", # start from 2025-10-27
+    "user:zibozhao52@gmail.com", # start from 2025-10-27
+    "user:harryberlin996@gmail.com", # start from 2025-10-27
+    "user:laaron1223@gmail.com", # start from 2025-10-27
+    "user:lzlzyy@hotmail.com", # start from 2025-10-27
   ]
 }
 
