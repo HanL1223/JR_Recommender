@@ -1,0 +1,17 @@
+[project]
+name = "data-training"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "dbt-bigquery>=1.10.2",
+    "dbt-core>=1.10.13",
+    "google-auth>=2.42.1",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.7",
+    "pandas>=2.3.3",
+    "pandas-gbq>=0.29.2",
+    "scikit-learn>=1.7.2",
+    "seaborn>=0.13.2",
+]

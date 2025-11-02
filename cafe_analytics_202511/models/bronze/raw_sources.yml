@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: cafe_raw_data
+    database: jr-data-training
+    schema: cafe
+    quoting:
+      database: true
+      schema: true
+      identifier: true
+    tables:
+      - name: cafe_sales
+        identifier: cafe-sales

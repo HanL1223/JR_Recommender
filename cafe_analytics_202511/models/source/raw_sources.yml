@@ -1,9 +1,0 @@
-version: 2
-
-sources:
-  - name: cafe_raw_data        # logical name for the raw source
-    database: jr-data-training # GCP project
-    schema: cafe               # production dataset
-    tables:
-      - name: cafe_sales       # logical name used in dbt: source('cafe_raw_data', 'cafe_sales')
-        identifier: cafe-sales # actual table in BigQuery
