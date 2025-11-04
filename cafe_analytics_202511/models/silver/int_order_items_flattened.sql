@@ -1,3 +1,8 @@
+{{ config(
+    materialized='view',
+    schema='silver'
+) }}
+
 WITH items_base AS (
   SELECT  
     order_id,

@@ -7,7 +7,7 @@ WITH customer_summary AS (
   SELECT
     customer_id,
     MIN(order_date_key) AS first_order_date,
-    MAX(order_date_key) AS last_order_date, -- Most recent order date
+    MAX(order_date_key) AS last_order_date, 
     COUNT(DISTINCT order_id) AS total_orders,
     SUM(cart_total_price) AS total_lifetime_value
   FROM {{ ref('int_orders_header') }}
@@ -24,19 +24,19 @@ SELECT
   total_lifetime_value,
   
   -- Segmentation
-  -- Business logic require
   CASE
     WHEN total_orders = 1 THEN 'New'
-    WHEN total_orders BETWEEN 3 AND 10 THEN 'Regular'
+    WHEN total_orders BETWEEN 2 AND 10 THEN 'Regular'
     WHEN total_orders > 10 THEN 'VIP'
   END AS customer_segment,
   
---   CASE 
---     WHEN DATE_DIFF(CURRENT_DATE(), last_order_date, DAY) <= 120 THEN 'True'
---     ELSE 'False'
---     END as is_active_flag
+  -- Recency / Active Flag
+  CASE 
+    WHEN DATE_DIFF(CURRENT_DATE(), last_order_date, DAY) <= 120 THEN TRUE
+    ELSE FALSE
+  END AS is_active_flag,
   
---   CURRENT_TIMESTAMP() AS created_at,
---   CURRENT_TIMESTAMP() AS updated_at
+  CURRENT_TIMESTAMP() AS created_at,
+  CURRENT_TIMESTAMP() AS updated_at
 
-FROM customer_summary
+FROM customer_summary;
