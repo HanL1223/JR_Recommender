@@ -22,12 +22,15 @@ SELECT
   CAST(JSON_VALUE(items, '$.order_name') AS STRING) AS order_name,
   CAST(JSON_VALUE(items, '$.order_phone') AS STRING) AS order_phone,
   
-  -- Derived fields
-  TIMESTAMP_DIFF(date_paid, date_created, SECOND) AS processing_seconds,
-  EXTRACT(HOUR FROM date_created) AS order_hour,
-  EXTRACT(DATE FROM date_created) AS order_date,
+  -- Derived fields timestamp
   
-  -- Day part classification
+  FORMAT_DATE('%Y%m%d',EXTRACT(DATE FROM date_created)) as order_date_key,
+  FORMAT_DATE('%Y%m%d',EXTRACT(DATE FROM date_paid)) as paid_date_key,
+  FORMAT_DATETIME('%H:%M', date_created) AS order_time_key,
+  FORMAT_DATETIME('%H:%M', date_paid) AS paid_time_key,
+  TIMESTAMP_DIFF(date_paid, date_created, SECOND) AS processing_seconds,
+  
+    -- Day part classification
   CASE 
     WHEN EXTRACT(HOUR FROM date_created) BETWEEN 6 AND 9 THEN 'Breakfast'
     WHEN EXTRACT(HOUR FROM date_created) BETWEEN 10 AND 11 THEN 'Morning'
@@ -35,7 +38,7 @@ SELECT
     WHEN EXTRACT(HOUR FROM date_created) BETWEEN 14 AND 16 THEN 'Afternoon'
     WHEN EXTRACT(HOUR FROM date_created) BETWEEN 17 AND 20 THEN 'Evening'
     ELSE 'Other'
-  END AS day_part,
+  END AS order_period,
   
   CURRENT_TIMESTAMP() AS loaded_at
 
