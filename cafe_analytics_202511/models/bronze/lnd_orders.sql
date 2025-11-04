@@ -4,4 +4,4 @@
 ) }}
 
 SELECT *
-FROM `jr-data-training.cafe.cafe-sales`
+FROM {{ source('cafe_raw_data', 'cafe_sales') }}

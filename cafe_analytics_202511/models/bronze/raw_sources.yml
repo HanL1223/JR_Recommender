@@ -11,3 +11,18 @@ sources:
     tables:
       - name: cafe_sales
         identifier: cafe-sales
+        description: "Raw cafe sales orders with nested JSON items"
+        columns:
+          - name: order_id
+            description: "Unique order identifier"
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            description: "Customer identifier"
+          - name: total
+            description: "Order total in cents"
+          - name: date_created
+            description: "When order was created"
+          - name: date_paid
+            description: "When order was paid"
