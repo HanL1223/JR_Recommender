@@ -1,0 +1,18 @@
+#profile to development across different device
+#if no global env set then use default for JR project
+#Win:setx DBT_PROFILES_DIR "C:\Users\you\Documents\dbt\cafe_analytics_202511\config"
+#Mac:C:\Users\you\Documents\dbt\cafe_analytics_202511
+
+cafe_analytics_202511:
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('DBT_PROJECT', 'jr-data-training') }}"
+      dataset: "{{ env_var('DBT_DATASET', 'dbt_medallion_dev') }}"
+      location: "australia-southeast1"
+      priority: "interactive"
+      threads: 4
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+  target: dev
