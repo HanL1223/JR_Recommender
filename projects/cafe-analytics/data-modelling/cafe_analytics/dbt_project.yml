@@ -35,4 +35,13 @@ models:
     +materialized: table
     staging:
       +materialized: view
+      +schema: bronze
+    intermediate:
+      +schema: silver
+    dims:
+      +schema: gold
+    facts:
+      +schema: gold
+    marts:
+      +schema: platinum
     

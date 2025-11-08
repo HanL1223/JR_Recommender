@@ -1,7 +1,8 @@
 centauri_alpha:
+  target: dev
   outputs:
     dev:
-      dataset: dbt_dev_mx
+      dataset: mx_dev
       job_execution_timeout_seconds: 300
       job_retries: 1
       location: australia-southeast1
@@ -10,4 +11,4 @@ centauri_alpha:
       project: jr-data-training
       threads: 4
       type: bigquery
-  target: dev
+  
