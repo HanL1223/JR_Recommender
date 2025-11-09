@@ -34,14 +34,18 @@ models:
   cafe_analytics:
     +materialized: table
     staging:
-      +materialized: view
       +schema: silver
+      +materialized: view
     intermediate:
       +schema: silver
+      +materialized: incremental
+      +on_schema_change: fail
     dims:
       +schema: gold
     facts:
       +schema: gold
+      +materialized: incremental
+      +on_schema_change: fail
     marts:
       +schema: platinum
     

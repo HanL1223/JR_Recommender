@@ -32,28 +32,44 @@ options_extracted as (
     cross join unnest(
         json_extract_array(orders_extracted.cart_items, '$.options')
     ) as item_options
-),
-
-options_indexed as (
-    select
-        {{ 
-            dbt_utils.generate_surrogate_key(
-                [
-                    'order_item_id',
-                    'order_id',
-                    'item_name',
-                    'option_name',
-                    'option_value',
-                    'option_price'
-                ]
-            ) 
-        }} as order_item_option_id,
-        *
-    from options_extracted
 )
 
-select * 
-from options_indexed
+select
+    {{ 
+        dbt_utils.generate_surrogate_key(
+            [
+                'order_item_id',
+                'order_id',
+                'item_name',
+                'option_name',
+                'option_value',
+                'option_price'
+            ]
+        ) 
+    }} as order_item_option_id,
+    * 
+from options_extracted 
+{% if is_incremental() %}
+    where
+    {% if var('start_date', False) and var('end_date', False) %}
+        {{ 
+            log(
+                'Loading ' ~ this ~ ' incrementally\nStart Date: ' ~ var('start_date') ~ '\nEnd Date: ' ~ var('end_date'), 
+                info=True
+            ) 
+        }}
+        date_created >= '{{ var("start_date") }}'
+        and date_created < '{{ var("end_date") }}'
+    {% else %}
+        {{
+            log(
+                'Loading ' ~ this ~ ' incrementally with no date range specified',
+                info=True
+            )
+        }}
+        date_created > (select max(date_created) from {{ this }})
+    {% endif %}
+{% endif %}
 order by 
     order_item_id, option_name desc, 
     option_value, option_price

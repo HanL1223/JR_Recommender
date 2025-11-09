@@ -21,5 +21,26 @@ product_sales as (
 )
 
 select * 
-from product_sales
+from product_sales 
+{% if is_incremental() %}
+    where
+    {% if var('start_date', False) and var('end_date', False) %}
+        {{ 
+            log(
+                'Loading ' ~ this ~ ' incrementally\nStart Date: ' ~ var('start_date') ~ '\nEnd Date: ' ~ var('end_date'), 
+                info=True
+            ) 
+        }}
+        date_created >= '{{ var("start_date") }}'
+        and date_created < '{{ var("end_date") }}'
+    {% else %}
+        {{
+            log(
+                'Loading ' ~ this ~ ' incrementally with no date range specified',
+                info=True
+            )
+        }}
+        date_created > (select max(date_created) from {{ this }})
+    {% endif %}
+{% endif %}
 order by order_item_id

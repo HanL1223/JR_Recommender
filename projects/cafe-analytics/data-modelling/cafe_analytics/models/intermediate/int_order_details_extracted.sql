@@ -239,8 +239,36 @@ orders_aggregated as (
         cart_items
 
     from orders_indexed
+),
+
+orders_distinct as (
+    select distinct * from orders_aggregated
 )
 
-select distinct * from orders_aggregated
+select *
+from orders_distinct
+where 
+    cart_items is not null
+{% if is_incremental() %}
+    {% if var('start_date', False) and var('end_date', False) %}
+        {{ 
+            log(
+                'Loading ' ~ this ~ ' incrementally\nStart Date: ' ~ var('start_date') ~ '\nEnd Date: ' ~ var('end_date'), 
+                info=True
+            ) 
+        }}
+        and date_created >= '{{ var("start_date") }}'
+        and date_created < '{{ var("end_date") }}'
+    {% else %}
+        {{
+            log(
+                'Loading ' ~ this ~ ' incrementally with no date range specified',
+                info=True
+            )
+        }}
+        and date_created > (select max(date_created) from {{ this }})
+    {% endif %}
+{% endif %}
+
 
 

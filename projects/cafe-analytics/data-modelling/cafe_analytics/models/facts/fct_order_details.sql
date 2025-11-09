@@ -6,7 +6,7 @@ orders_extracted as (
 ),
 
 order_details as (
-    select
+    select distinct
         order_id,
         customer_id,
         date_created,
@@ -22,7 +22,28 @@ order_details as (
     from orders_extracted
 )
 
-select distinct * 
-from order_details
+select * 
+from order_details 
+{% if is_incremental() %}
+    where
+    {% if var('start_date', False) and var('end_date', False) %}
+        {{ 
+            log(
+                'Loading ' ~ this ~ ' incrementally\nStart Date: ' ~ var('start_date') ~ '\nEnd Date: ' ~ var('end_date'), 
+                info=True
+            ) 
+        }}
+        date_created >= '{{ var("start_date") }}'
+        and date_created < '{{ var("end_date") }}'
+    {% else %}
+        {{
+            log(
+                'Loading ' ~ this ~ ' incrementally with no date range specified',
+                info=True
+            )
+        }}
+        date_created > (select max(date_created) from {{ this }})
+    {% endif %}
+{% endif %}
 order by order_id
 
