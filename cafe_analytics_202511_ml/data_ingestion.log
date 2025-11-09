@@ -1,0 +1,46 @@
+2025-11-07 19:49:47 [INFO] src.api: Server loading and splitting data from: C:\cafe-analysis\data-training\cafe_analytics_202511_ml\data\raw/Train.csv
+2025-11-07 19:49:47 [ERROR] src.api: WARRING: Could not load or split data.
+2025-11-07 19:52:46 [INFO] src.api: Starting up FastAPI app and loading data from BigQuery.
+2025-11-07 19:52:46 [INFO] src.api: Executing BigQuery: 
+        SELECT *
+        FROM `jr-data-training.dbt_medallion_dev_gold.fact_order_items`
+        
+2025-11-07 19:53:15 [INFO] src.api: Starting up FastAPI app and loading data from BigQuery.
+2025-11-07 19:53:15 [INFO] src.api: Executing BigQuery: 
+        SELECT *
+        FROM `jr-data-training.dbt_medallion_dev_gold.fact_order_items`
+        
+2025-11-07 19:53:37 [INFO] src.api: BigQuery data loaded. Shape: (572943, 13)
+2025-11-07 19:53:37 [INFO] src.api: Train/test split completed.
+2025-11-07 19:53:37 [INFO] src.api: Data successfully loaded into app state.
+2025-11-07 19:53:37 [INFO] src.api: Application shutdown complete.
+2025-11-07 19:53:40 [INFO] src.api: Starting up FastAPI app and loading data from BigQuery.
+2025-11-07 19:53:40 [INFO] src.api: Executing BigQuery: 
+        SELECT *
+        FROM `jr-data-training.dbt_medallion_dev_gold.fact_order_items`
+        
+2025-11-07 19:54:01 [INFO] src.api: BigQuery data loaded. Shape: (572943, 13)
+2025-11-07 19:54:02 [INFO] src.api: Train/test split completed.
+2025-11-07 19:54:02 [INFO] src.api: Data successfully loaded into app state.
+2025-11-07 19:54:23 [INFO] src.api: BigQuery data loaded. Shape: (572943, 13)
+2025-11-07 19:54:23 [INFO] src.api: Train/test split completed.
+2025-11-07 19:54:23 [INFO] src.api: Data successfully loaded into app state.
+2025-11-07 19:57:10 [INFO] src.Data_ingestor: Fetching data from API endpoint: http://127.0.0.1:8000/train
+2025-11-07 19:57:10 [ERROR] src.Data_ingestor: Failed to fetch data from API: http://127.0.0.1:8000/train
+Traceback (most recent call last):
+  File "C:\cafe-analysis\data-training\cafe_analytics_202511_ml\src\Data_ingestor.py", line 21, in ingest
+    response.raise_for_status()
+  File "C:\cafe-analysis\data-training\.venv\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: http://127.0.0.1:8000/train
+2025-11-07 19:58:03 [INFO] src.api: Application shutdown complete.
+2025-11-07 19:58:08 [INFO] src.api: Starting up FastAPI app and loading data from BigQuery.
+2025-11-07 19:58:08 [INFO] src.api: Executing BigQuery: 
+        SELECT *
+        FROM `jr-data-training.dbt_medallion_dev_gold.fact_order_items`
+        
+2025-11-07 19:58:54 [INFO] src.api: BigQuery data loaded. Shape: (572943, 13)
+2025-11-07 19:58:54 [INFO] src.api: Train/test split completed.
+2025-11-07 19:58:54 [INFO] src.api: Data successfully loaded into app state.
+2025-11-07 20:03:20 [INFO] src.api: Application shutdown complete.
+2025-11-07 20:03:20 [INFO] src.api: Application shutdown complete.

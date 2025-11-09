@@ -1,24 +1,17 @@
 version: 2
 
 models:
-  - name: int_orders_header
+  - name: int_orders
     description: "Order header information extracted from JSON"
     columns:
       - name: order_id
         tests:
           - unique
           - not_null
-      - name: cart_total_price
-        tests:
-          - not_null
-
-  - name: int_order_items_flattened
-    description: "Line items with pricing breakdown"
-    columns:
-      - name: order_item_sk
-        tests:
-          - unique
-          - not_null
 
   - name: int_order_item_options
-    description: "Flattened options per line item"
+    description: "Line items with pricing breakdown"
+
+
+  - name: int_orders_item
+    description: "Info for each order,each row represents a single order."
