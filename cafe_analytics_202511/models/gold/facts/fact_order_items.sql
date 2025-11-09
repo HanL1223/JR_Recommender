@@ -16,7 +16,10 @@ order_surcharge,
  order_display_price,
 order_display_gst,
  cart_size,
-cart_order_time
+cart_order_time,
+--product
+
+
 -- FK
 {{ dbt_utils.generate_surrogate_key(['customer_id']) }} AS customer_key,
 {{ dbt_utils.generate_surrogate_key(['product_name', 'product_variant']) }} AS product_key

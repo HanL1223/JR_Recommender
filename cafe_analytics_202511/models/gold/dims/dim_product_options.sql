@@ -5,11 +5,11 @@
 
 WITH distinct_options AS (
     SELECT DISTINCT
-        JSON_VALUE(cart_item, '$.name') AS product_name,
-        JSON_VALUE(cart_item, '$.variant_name') AS product_variant,
-        JSON_VALUE(cart_item, '$.category') AS product_category,
-        JSON_VALUE(option, '$.name') AS product_option_name,
-        JSON_VALUE(option, '$.value') AS product_option_value,
+        TRIM(JSON_VALUE(cart_item, '$.name')) AS product_name,
+        TRIM(JSON_VALUE(cart_item, '$.variant_name')) AS product_variant,
+        COALESCE(TRIM(JSON_VALUE(cart_item, '$.category')), 'Unknown') AS product_category,
+        TRIM(JSON_VALUE(option, '$.name')) AS product_option_name,
+        COALESCE(TRIM(JSON_VALUE(option, '$.value')), 'None') AS product_option_value,
         CAST(JSON_VALUE(option, '$.price') AS INT64) AS product_option_price
     FROM {{ ref('lnd_orders') }},
     UNNEST(JSON_EXTRACT_ARRAY(items, '$.cart')) AS cart_item,
@@ -39,4 +39,3 @@ SELECT
     CURRENT_TIMESTAMP() AS created_at,
     CURRENT_TIMESTAMP() AS updated_at
 FROM distinct_options
-ORDER BY product_name, product_variant, product_option_name

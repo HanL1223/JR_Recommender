@@ -3,26 +3,26 @@
     schema='gold'
 ) }}
 
-
 SELECT
-    order_id,
-    {{ dbt_utils.generate_surrogate_key(['customer_id']) }} AS customer_key,
-    
-    -- Order variable
+    src.order_id,
 
-order_date,
- order_time,
-order_total_price,
- order_gst,
-order_surcharge,
- order_display_price,
-order_display_gst,
- cart_size,
-cart_order_time
+    {{ dbt_utils.generate_surrogate_key(['dc.customer_id']) }} AS customer_key,
 
-    -- 
-    --ETL Measure
+    -- Order variables
+    src.order_date,
+    src.order_time,
+    src.order_total_price,
+    src.order_gst,
+    src.order_surcharge,
+    src.order_display_price,
+    src.order_display_gst,
+    src.cart_size,
+    src.cart_order_time,
+
+    -- ETL metadata
     CURRENT_TIMESTAMP() AS created_at,
     CURRENT_TIMESTAMP() AS updated_at
-FROM  {{ref('int_orders')}} src 
-left join {{ref('dim_customers')}} dc on src.customer_id = dc.customer_id
+
+FROM {{ ref('int_orders') }} AS src
+LEFT JOIN {{ ref('dim_customers') }} AS dc
+    ON src.customer_id = dc.customer_id

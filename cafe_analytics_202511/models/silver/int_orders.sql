@@ -17,4 +17,4 @@ SELECT
     LTRIM(JSON_VALUE(items, '$.cart_gst_display'), '$') AS order_display_gst,
     JSON_VALUE(items, '$.cart_size') AS cart_size,
     JSON_VALUE(items, '$.order_time') AS cart_order_time
-FROM FROM {{ ref('lnd_orders') }}
+FROM  {{ ref('lnd_orders') }}
