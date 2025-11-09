@@ -20,8 +20,12 @@ models:
                     'Kitchen'
                 ]
 
-    - name: int_order_item_options_extracted
+    - name: fct_order_item_options
       columns:
+        - name: order_item_option_id
+          tests:
+            - unique
+            - not_null
         - name: order_id
           tests:
             - relationships:
@@ -37,13 +41,6 @@ models:
             - relationships:
                 to: ref('fct_product_sales')
                 field: order_item_id 
-
-    - name: fct_order_item_options
-      columns:
-        - name: order_item_option_id
-          tests:
-            - unique
-            - not_null
         
     - name: fct_order_details
       columns:

@@ -15,7 +15,8 @@ product_sales as (
             2
         ) as price,
         item_quantity as quantity,
-        item_price as item_sales
+        item_price as item_sales,
+        date_created
     from orders_extracted
 )
 

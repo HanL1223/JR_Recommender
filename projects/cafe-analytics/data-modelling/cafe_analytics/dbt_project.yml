@@ -35,7 +35,7 @@ models:
     +materialized: table
     staging:
       +materialized: view
-      +schema: bronze
+      +schema: silver
     intermediate:
       +schema: silver
     dims:

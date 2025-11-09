@@ -1,8 +1,8 @@
 with
 
-options_extracted as (
+order_item_options as (
     select *
-    from {{ ref("int_order_item_options_extracted") }}
+    from {{ ref("fct_order_item_options") }}
 ),
 
 item_options as (
@@ -12,7 +12,7 @@ item_options as (
         option_value,
         option_price,
         date(min(date_created)) as start_date
-    from options_extracted
+    from order_item_options
     group by 1, 2, 3, 4
 ),
 
