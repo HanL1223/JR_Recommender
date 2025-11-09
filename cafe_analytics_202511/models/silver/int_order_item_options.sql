@@ -4,28 +4,6 @@
 ) }}
 
 
-
--- SELECT
---   order_id,
---   customer_id,
---   JSON_VALUE(items, '$.cart_total_price') AS order_total_price,
---   ltrim(JSON_VALUE(items, '$.cart_total_price_display'),'$') AS order_display_price,
---   ltrim(JSON_VALUE(items, '$.cart_gst_display'),'$') AS order_gst_price,
---   JSON_VALUE(cart_item, '$.name') AS product,
---   JSON_VALUE(cart_item, '$.category') AS product_category,
---   JSON_VALUE(option, '$.name') AS product_option_name,
---   JSON_VALUE(option, '$.value') AS product_option_value,
---   JSON_VALUE(items, '$.cart_size') AS cart_size,
---   JSON_VALUE(items, '$.cart_surcharge') AS cart_surcharge,
---   JSON_VALUE(items, '$.order_time') AS cart_order_time,
---   CAST(JSON_VALUE(option, '$.price') AS INT64) AS product_option_price,
---   DATE(TIMESTAMP(date_created)) AS order_date, 
---   TIME(TIMESTAMP(date_created)) AS order_time
--- FROM {{ ref('lnd_orders') }},
--- UNNEST(JSON_EXTRACT_ARRAY(items, '$.cart')) AS cart_item,
--- UNNEST(JSON_EXTRACT_ARRAY(cart_item, '$.options')) AS option
-
-
 WITH parsed_cart AS (
   SELECT
     order_id,
@@ -48,5 +26,5 @@ SELECT
   JSON_VALUE(option, '$.value') AS product_option_value,
   CAST(JSON_VALUE(option, '$.price') AS INT64) AS product_option_price
 FROM parsed_cart,
-UNNEST(JSON_EXTRACT_ARRAY(cart_item, '$.options')) AS option
+  UNNEST(JSON_EXTRACT_ARRAY(cart_item, '$.options')) AS option
 ORDER BY order_id, order_item_id
