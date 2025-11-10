@@ -3,3 +3,5 @@ target/
 dbt_packages/
 logs/
 .vscode
+package-lock.yml
+.user.yml
