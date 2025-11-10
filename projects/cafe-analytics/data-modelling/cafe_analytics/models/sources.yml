@@ -5,6 +5,8 @@ sources:
       description: Cafe's online sales raw data.
       database: jr-data-training
       schema: cafe
+      config:
+        tags: ['source', 'raw data']
       tables:
         - name: cafe
           identifier: cafe-sales
