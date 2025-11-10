@@ -36,16 +36,43 @@ models:
     staging:
       +schema: silver
       +materialized: view
+      +tags:
+        - "staging"
+        - "view"
+        - "silver"
     intermediate:
       +schema: silver
       +materialized: incremental
       +on_schema_change: fail
+      +tags:
+        - "intermediate"
+        - "incremental"
+        - "silver"
     dims:
       +schema: gold
+      +tags:
+        - "dimension"
+        - "table"
+        - "full replace"
+        - "gold"
     facts:
       +schema: gold
       +materialized: incremental
       +on_schema_change: fail
+      +tags:
+        - "fact"
+        - "incremental"
+        - "gold"
     marts:
       +schema: platinum
+      +tags:
+        - "mart"
+        - "denormalized"
+        - "platinum"
+        - "reporting"
+        - "analytics"
+        - "end users"
+        - "dashboards"
+        - "BI"
+        - "data consumers"
     

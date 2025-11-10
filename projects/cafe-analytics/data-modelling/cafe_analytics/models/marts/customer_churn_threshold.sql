@@ -1,3 +1,9 @@
+{{
+    config(
+        tags=["table", "full replace"]    
+    )
+}}
+
 with
 
 paid_orders as (

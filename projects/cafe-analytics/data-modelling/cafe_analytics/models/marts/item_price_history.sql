@@ -1,3 +1,9 @@
+{{
+    config(
+        tags=["table", "full replace"]    
+    )
+}}
+
 with
 
 item_options as (
