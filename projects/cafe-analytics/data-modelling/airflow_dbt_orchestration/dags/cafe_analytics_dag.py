@@ -22,7 +22,7 @@ _profile_config = ProfileConfig(
     profile_name=PROFILE_NAME,
     target_name=TARGET_NAME,
     profile_mapping=GoogleCloudOauthProfileMapping(
-        conn_id="gcp_conn",  # A connection for Google Cloud needs to be created in Airflow
+        conn_id="gcp_conn",  # A connection for Google Cloud needs to be created in Airflow UI
         profile_args={
             "project": PROJECT_NAME, "dataset": DATASET_NAME
         },
