@@ -1,0 +1,13 @@
+services:
+  scheduler:
+    volumes:
+      - /c/Users/Meeno/AppData/Roaming/gcloud/application_default_credentials.json:/usr/local/airflow/gcloud/application_default_credentials.json:rw
+  api-server:
+    volumes:
+      - /c/Users/Meeno/AppData/Roaming/gcloud/application_default_credentials.json:/usr/local/airflow/gcloud/application_default_credentials.json:rw
+  triggerer:
+    volumes:
+      - /c/Users/Meeno/AppData/Roaming/gcloud/application_default_credentials.json:/usr/local/airflow/gcloud/application_default_credentials.json:rw
+  dag-processor:
+    volumes:
+      - /c/Users/Meeno/AppData/Roaming/gcloud/application_default_credentials.json:/usr/local/airflow/gcloud/application_default_credentials.json:rw
