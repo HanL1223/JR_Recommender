@@ -15,7 +15,6 @@ ENABLE_FULL_REFRESH = (
 
 _project_config = ProjectConfig(
     dbt_project_path=DBT_PROJECT_PATH,
-    install_dbt_deps=True,
 )
 
 _profile_config = ProfileConfig(
@@ -39,6 +38,7 @@ dbt_cafe_analytics_dag = DbtDag(
     execution_config=_execution_config,
     operator_args={
         "full_refresh": ENABLE_FULL_REFRESH,  # This enables the full refresh
+        "install_deps": True,
     },
     # normal dag parameters
     schedule="@monthly",
