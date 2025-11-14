@@ -43,3 +43,41 @@ Contact
 =======
 
 The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+
+
+## Authenticate Astro to Google Cloud Platform (GCP)
+
+To connect your **Astro project** with **Google Cloud Platform (GCP)**, follow the steps below:
+
+### 1. Locate your Application Default Credentials (ADC)
+
+Find the location of your ADC file by following the Astronomer documentation:
+
+👉 [Retrieve GCP user credentials locally](https://www.astronomer.io/docs/astro/cli/authenticate-to-gcp#retrieve-gcp-user-credentials-locally)
+
+---
+
+### 2. Create a `docker-compose.override.yml` file
+
+In your Astro project, create a new file named **`docker-compose.override.yml`**.
+
+This file is used to mount your local ADC file into the Airflow containers.
+
+👉 [Configure your Astro project for GCP authentication](https://www.astronomer.io/docs/astro/cli/authenticate-to-gcp#configure-your-astro-project)
+
+---
+
+### 3. Configure environment variables
+
+Create or update your **`.env`** file to include any environment variables required for authentication or configuration, such as `GOOGLE_APPLICATION_CREDENTIALS`
+
+---
+
+### 4. Add a Google Cloud connection in Airflow
+
+Open the **Airflow UI** and create a new connection named **`gcp_conn`**:
+
+- Connection ID: `gcp_conn`
+- **Connection Type:** `Google Cloud`
+
+This connection allows your DAGs and dbt tasks to interact with BigQuery, GCS, and other GCP services securely.
