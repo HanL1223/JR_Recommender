@@ -1,4 +1,6 @@
-# **Overview**
+# Orchestrate dbt Models with *Apache Airflow*
+
+## **Overview**
 
 This project demonstrates how to orchestrate ***dbt* models** as a standalone data pipeline with [***Apache Airflow***](https://airflow.apache.org/docs/) using the [***Astronomer Cosmos***](https://github.com/astronomer/astronomer-cosmos) framework.
 
@@ -8,7 +10,7 @@ The project folder was initialised with the [*Astronomer CLI*](https://www.astro
 
 In this project, we integrated our dbt modelling project, [**dbt_cafe_analytics**](./dags/dbt/dbt_cafe_analytics), into an *Astro Cosmos* project folder, and configured it as a standalone *Airflow* DAG that is scheduled to run locally on a monthly basis.
 
-# **Project Structure**
+## **Project Structure**
 
 The project contains the following files and folders:
 
@@ -56,33 +58,33 @@ astro-dbt-orchestration/
 - **.gitignore**:  Specifies files and folders that Git ignores in version control.
 - **README.md**: Provides an overview, setup instructions, and documentation for the dbt orchestration project.
 
-# **Deploy Project Locally**
+## **Deploy Project Locally**
 
 Please follow the steps below to deploy the project locally with *Apache Airflow*:
 
-## Step 1: Authenticate Astro to Google Cloud Platform (GCP)
+### Step 1: Authenticate Astro to Google Cloud Platform (GCP)
 
-### Step 1.1: Locate your Application Default Credentials (ADC)
+#### Step 1.1: Locate your Application Default Credentials (ADC)
 
 Find the location of your ADC file by following the Astronomer documentation:
 
 👉 [Retrieve GCP user credentials locally](https://www.astronomer.io/docs/astro/cli/authenticate-to-gcp#retrieve-gcp-user-credentials-locally)
 
-### Step 1.2: Mount ADC into Airflow container
+#### Step 1.2: Mount ADC into Airflow container
 
 In the Astro project, configure the **`docker-compose.override.yml`**  with your local ADC location to mount the local ADC file into the Airflow container.
 
 👉 [Configure your Astro project for GCP authentication](https://www.astronomer.io/docs/astro/cli/authenticate-to-gcp#configure-your-astro-project)
 
-### Step 1.3: Configure environment variables
+#### Step 1.3: Configure environment variables
 
 Update **`.env`** file to include any environment variables required for GCP authentication and configurations required for dag files, such as `GOOGLE_APPLICATION_CREDENTIALS`
 
-### Step 1.4: Add a Google Cloud connection in Airflow
+#### Step 1.4: Add a Google Cloud connection in Airflow
 
 Add a *Google Cloud* connection in **`airflow_settings.yaml`**, which allows the DAG to interact with *GCP BigQuery* and other *GCP* services securely.
 
-## Step 2: Install dbt adaptor into virtual environment
+### Step 2: Install dbt adaptor into virtual environment
 
 Add the following command to the **`Dockerfile`** to create a virtual environment named `dbt_venv` and install the `dbt-bigquery` adapter within it:
 
@@ -92,7 +94,7 @@ RUN python -m venv dbt_venv && source dbt_venv/bin/activate && \
     pip install --no-cache-dir dbt-bigquery && deactivate
 ```
 
-## Step 3: Install Python packages required
+### Step 3: Install Python packages required
 
 Include the Python packages below in **`requirements.txt`** to install the required libraries and dependencies:
 
@@ -102,7 +104,7 @@ apache-airflow-providers-google
 dbt-bigquery
 ```
 
-## Step 4: Start Airflow locally
+### Step 4: Start Airflow locally
 
 Start Airflow on your local machine by running:
 ```
@@ -121,6 +123,6 @@ When all five containers are ready the command will open the browser to the Airf
 
 Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
 
-# **Deploy Your Project to Astronomer (Optional)**
+## **Deploy Your Project to Astronomer (Optional)**
 
 If you have an Astronomer account, you can follow the Astronomer deployment guide here: 👉 [Deploy your project on Astronomer](https://www.astronomer.io/docs/astro/deploy-code/).
