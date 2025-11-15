@@ -10,7 +10,7 @@ The project folder was initialised with the [Astronomer CLI](https://www.astrono
 
 ***Astronomer Cosmos*** is an open-source package that automatically creates Airflow tasks from dbt models. With Astro Cosmos, we can easily convert a dbt Core project into either a standalone Airflow DAG or a task group within a DAG.
 
-In this project, we integrated our dbt modelling project, [**dbt_cafe_analytics**](./dags/dbt/dbt_cafe_analytics), into an Astro Cosmos project folder, and configured it as a standalone Airflow DAG that is scheduled to run locally on a monthly basis.
+In this project, we integrated our dbt modelling project, [**dbt_cafe_analytics**](../dbt_cafe_analytics), into an Astro Cosmos project folder, and configured it as a standalone Airflow DAG that is scheduled to run locally on a monthly basis.
 
 <p align="center">
   <img src="./assets/airflow_dbt_dag.PNG" alt="DAG Lineage Graph" width="70%">
