@@ -1,6 +1,6 @@
 # **Overview**
 
-This project demonstrates how to orchestrate ***dbt* models** as a standalone data pipeline with [***Apache Airflow*](https://airflow.apache.org/docs/)** using the [***Astronomer Cosmos***](https://github.com/astronomer/astronomer-cosmos) framework.
+This project demonstrates how to orchestrate ***dbt* models** as a standalone data pipeline with [***Apache Airflow***](https://airflow.apache.org/docs/) using the [***Astronomer Cosmos***](https://github.com/astronomer/astronomer-cosmos) framework.
 
 The project folder was initialised with the [*Astronomer CLI*](https://www.astronomer.io/docs/astro/cli/overview) via the command 'astro dev init'.
 
@@ -80,11 +80,11 @@ Update **`.env`** file to include any environment variables required for GCP aut
 
 ### Step 1.4: Add a Google Cloud connection in Airflow
 
-Add a *Google Cloud* connection in `airflow_settings.yaml` , which allows the DAG to interact with *GCP BigQuery* and other *GCP* services securely.
+Add a *Google Cloud* connection in **`airflow_settings.yaml`**, which allows the DAG to interact with *GCP BigQuery* and other *GCP* services securely.
 
 ## Step 2: Install dbt adaptor into virtual environment
 
-Add the following command to the `Dockerfile` to create a virtual environment named `dbt_venv` and install the `dbt-bigquery` ****adapter within it:
+Add the following command to the **`Dockerfile`** to create a virtual environment named `dbt_venv` and install the `dbt-bigquery` adapter within it:
 
 ```docker
 # Create a virtual environment and install dbt-bigquery
@@ -94,7 +94,7 @@ RUN python -m venv dbt_venv && source dbt_venv/bin/activate && \
 
 ## Step 3: Install Python packages required
 
-Include the Python packages below in `requirements.txt` to install the required libraries and dependencies:
+Include the Python packages below in **`requirements.txt`** to install the required libraries and dependencies:
 
 ```
 astronomer-cosmos
@@ -104,7 +104,10 @@ dbt-bigquery
 
 ## Step 4: Start Airflow locally
 
-Start Airflow on your local machine by running 'astro dev start'.
+Start Airflow on your local machine by running:
+```
+astro dev start
+```
 
 This command will spin up five Docker containers on your machine, each for a different Airflow component:
 
@@ -114,10 +117,10 @@ This command will spin up five Docker containers on your machine, each for a dif
 - API Server: The Airflow component responsible for serving the Airflow UI and API
 - Triggerer: The Airflow component responsible for triggering deferred tasks
 
-When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at 'localhost:5432/postgres' with username 'postgres' and password 'postgres'.
+When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at [localhost:5432/postgres](localhost:5432/postgres) with username ***postgres*** and password ***postgres***.
 
 Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
 
 # **Deploy Your Project to Astronomer**
 
-If you have an Astronomer account, you can follow the Astronomer deployment guide here: [Deploy your project on Astronomer](https://www.astronomer.io/docs/astro/deploy-code/).
+If you have an Astronomer account, you can follow the Astronomer deployment guide here: 👉 [Deploy your project on Astronomer](https://www.astronomer.io/docs/astro/deploy-code/).
