@@ -1,24 +1,108 @@
-Overview
-========
+# **Overview**
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+This project demonstrates how to orchestrate ***dbt* models** as a standalone data pipeline with [***Apache Airflow*](https://airflow.apache.org/docs/)** using the [***Astronomer Cosmos***](https://github.com/astronomer/astronomer-cosmos) framework.
 
-Project Contents
-================
+The project folder was initialised with the [*Astronomer CLI*](https://www.astronomer.io/docs/astro/cli/overview) via the command 'astro dev init'.
 
-Your Astro project contains the following files and folders:
+***Astronomer Cosmos*** is an open-source package that automatically creates *Airflow* tasks from *dbt* models. With *Astro Cosmos*, we can easily convert a *dbt Core* project into either a standalone *Airflow* DAG or a task group within a DAG.
 
-- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
-    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
-- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
-- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
-- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
-- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
-- plugins: Add custom or community plugins for your project to this file. It is empty by default.
-- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
+In this project, we integrated our dbt modelling project, [**dbt_cafe_analytics**](./dags/dbt/dbt_cafe_analytics), into an *Astro Cosmos* project folder, and configured it as a standalone *Airflow* DAG that is scheduled to run locally on a monthly basis.
 
-Deploy Your Project Locally
-===========================
+# **Project Structure**
+
+The project contains the following files and folders:
+
+```jsx
+astro-dbt-orchestration/
+├── dags/
+│   ├── dbt/
+│   │   └── dbt_cafe_analytics/
+│   ├── .airflowignore
+│   └── cafe_analytics_dag.py
+├── .astro/
+│   ├── config.yaml
+│   ├── dag_integrity_exceptions.txt
+│   └── test_dag_integrity_default.py
+├── assets/
+│   └── airflow_dbt_dag.PNG
+├── docker-compose.override.yml
+├── .env
+├── airflow_settings.yaml
+├── requirements.txt
+├── .dockerignore
+├── Dockerfile
+├── packages.txt
+├── .gitignore
+└── README.md
+```
+
+- **dags**:
+    - **dbt/dbt_cafe_analytics**: Integrated *dbt Core* project folder containing models, tests, and configurations used for transformation logic.
+    - **.airflowignore**: Defines files and directories that *Airflow* should skip when parsing DAGs.
+    - **cafe_analytics_dag.py**: A Python file for the *Airflow* DAG to orchestrate dbt model execution.
+- **.astro**:
+    - **config.yaml**: An Astro project configuration file that specify environment settings and dependencies.
+    - **dag_integrity_exceptions.txt**: Lists DAGs excluded from automatic integrity checks during validation.
+    - **test_dag_integrity_default.py**: Default test file ensuring that all DAGs load correctly within the Astro environment.
+- **assets**
+    - **airflow_dbt_dag.PNG**: Image displaying the *Airflow* DAG lineage graph, used for README documentation.
+- **docker-compose.override.yml**: Mounts local Application Default Credential (ADC) file into the Airflow container.
+- **.env**: Stores local environment variables, including GCP authentication, project and dataset details, dbt profile settings, and a flag to enable or disable full-refresh runs.
+- **airflow_settings.yaml**: Defines *Airflow* Connections, Variables, and Pools for local development, allowing consistent setup without manual configuration in the Airflow UI.
+- **requirements.txt**: Lists all Python packages required to be installed for the project.
+- **.dockerignore**: Specifies files and directories to exclude from the Docker build context.
+- **Dockerfile**: Contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience, and specifies the commands to execute that install dbt adapators into the virtual environment.
+- **packages.txt**: Lists OS-level dependencies to be installed in the container (empty by default).
+- **.gitignore**:  Specifies files and folders that Git ignores in version control.
+- **README.md**: Provides an overview, setup instructions, and documentation for the dbt orchestration project.
+
+# **Deploy Project Locally**
+
+Please follow the steps below to deploy the project locally with *Apache Airflow*:
+
+## Step 1: Authenticate Astro to Google Cloud Platform (GCP)
+
+### Step 1.1: Locate your Application Default Credentials (ADC)
+
+Find the location of your ADC file by following the Astronomer documentation:
+
+👉 [Retrieve GCP user credentials locally](https://www.astronomer.io/docs/astro/cli/authenticate-to-gcp#retrieve-gcp-user-credentials-locally)
+
+### Step 1.2: Mount ADC into Airflow container
+
+In the Astro project, configure the **`docker-compose.override.yml`**  with your local ADC location to mount the local ADC file into the Airflow container.
+
+👉 [Configure your Astro project for GCP authentication](https://www.astronomer.io/docs/astro/cli/authenticate-to-gcp#configure-your-astro-project)
+
+### Step 1.3: Configure environment variables
+
+Update **`.env`** file to include any environment variables required for GCP authentication and configurations required for dag files, such as `GOOGLE_APPLICATION_CREDENTIALS`
+
+### Step 1.4: Add a Google Cloud connection in Airflow
+
+Add a *Google Cloud* connection in `airflow_settings.yaml` , which allows the DAG to interact with *GCP BigQuery* and other *GCP* services securely.
+
+## Step 2: Install dbt adaptor into virtual environment
+
+Add the following command to the `Dockerfile` to create a virtual environment named `dbt_venv` and install the `dbt-bigquery` ****adapter within it:
+
+```docker
+# Create a virtual environment and install dbt-bigquery
+RUN python -m venv dbt_venv && source dbt_venv/bin/activate && \
+    pip install --no-cache-dir dbt-bigquery && deactivate
+```
+
+## Step 3: Install Python packages required
+
+Include the Python packages below in `requirements.txt` to install the required libraries and dependencies:
+
+```
+astronomer-cosmos
+apache-airflow-providers-google  
+dbt-bigquery
+```
+
+## Step 4: Start Airflow locally
 
 Start Airflow on your local machine by running 'astro dev start'.
 
@@ -30,54 +114,10 @@ This command will spin up five Docker containers on your machine, each for a dif
 - API Server: The Airflow component responsible for serving the Airflow UI and API
 - Triggerer: The Airflow component responsible for triggering deferred tasks
 
-When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at 'localhost:5432/postgres' with username 'postgres' and password 'postgres'.
+When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at 'localhost:5432/postgres' with username 'postgres' and password 'postgres'.
 
-Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
+Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
 
-Deploy Your Project to Astronomer
-=================================
+# **Deploy Your Project to Astronomer**
 
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
-
-Contact
-=======
-
-The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
-
-
-## Authenticate Astro to Google Cloud Platform (GCP)
-
-To connect your **Astro project** with **Google Cloud Platform (GCP)**, follow the steps below:
-
-### 1. Locate your Application Default Credentials (ADC)
-
-Find the location of your ADC file by following the Astronomer documentation:
-
-👉 [Retrieve GCP user credentials locally](https://www.astronomer.io/docs/astro/cli/authenticate-to-gcp#retrieve-gcp-user-credentials-locally)
-
----
-
-### 2. Create a `docker-compose.override.yml` file
-
-In your Astro project, create a new file named **`docker-compose.override.yml`**.
-
-This file is used to mount your local ADC file into the Airflow containers.
-
-👉 [Configure your Astro project for GCP authentication](https://www.astronomer.io/docs/astro/cli/authenticate-to-gcp#configure-your-astro-project)
-
----
-
-### 3. Configure environment variables
-
-Create or update your **`.env`** file to include any environment variables required for authentication or configuration, such as `GOOGLE_APPLICATION_CREDENTIALS`
-
----
-
-### 4. Add a Google Cloud connection in Airflow
-
-Open the **Airflow UI** and create a new connection named **`gcp_conn`**:
-
-- Connection ID: `gcp_conn`
-- **Connection Type:** `Google Cloud`
-
-This connection allows your DAGs and dbt tasks to interact with BigQuery, GCS, and other GCP services securely.
+If you have an Astronomer account, you can follow the Astronomer deployment guide here: [Deploy your project on Astronomer](https://www.astronomer.io/docs/astro/deploy-code/).
