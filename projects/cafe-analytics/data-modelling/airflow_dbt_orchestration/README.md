@@ -12,6 +12,8 @@ In this project, we integrated our dbt modelling project, [**dbt_cafe_analytics*
 
 <p align="center">
   <img src="./assets/airflow_dbt_dag.PNG" alt="DAG Lineage Graph" width="70%">
+  <br>
+  <em>Figure 1: A successful DAG run of dbt models in Airflow</em>
 </p>
 
 ## **Project Structure**
