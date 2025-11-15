@@ -121,6 +121,6 @@ When all five containers are ready the command will open the browser to the Airf
 
 Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
 
-# **Deploy Your Project to Astronomer**
+# **Deploy Your Project to Astronomer (Optional)**
 
 If you have an Astronomer account, you can follow the Astronomer deployment guide here: 👉 [Deploy your project on Astronomer](https://www.astronomer.io/docs/astro/deploy-code/).
