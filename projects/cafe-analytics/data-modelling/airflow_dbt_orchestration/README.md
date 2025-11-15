@@ -6,8 +6,6 @@
 
 This project demonstrates how to orchestrate **dbt models** as a standalone data pipeline with [**Apache Airflow**](https://airflow.apache.org/docs/) using the [**Astronomer Cosmos**](https://github.com/astronomer/astronomer-cosmos) framework.
 
-The project folder was initialised with the [Astronomer CLI](https://www.astronomer.io/docs/astro/cli/overview) via the command 'astro dev init'.
-
 ***Astronomer Cosmos*** is an open-source package that automatically creates Airflow tasks from dbt models. With Astro Cosmos, we can easily convert a dbt Core project into either a standalone Airflow DAG or a task group within a DAG.
 
 In this project, we integrated our dbt modelling project, [**dbt_cafe_analytics**](../dbt_cafe_analytics), into an Astro Cosmos project folder, and configured it as a standalone Airflow DAG that is scheduled to run locally on a monthly basis.
@@ -22,7 +20,12 @@ In this project, we integrated our dbt modelling project, [**dbt_cafe_analytics*
 
 ## **Project Structure**
 
-The project contains the following files and folders:
+The project folder was initialised with the [Astronomer CLI](https://www.astronomer.io/docs/astro/cli/overview) via the command:
+```
+astro dev init
+```
+
+The project now contains the following files and folders:
 
 ```jsx
 astro-dbt-orchestration/
