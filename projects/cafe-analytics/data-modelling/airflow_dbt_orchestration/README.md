@@ -1,4 +1,4 @@
-# Orchestrate dbt Models with *Apache Airflow*
+# Orchestrate dbt Models with Apache Airflow
 
 <br>
 
