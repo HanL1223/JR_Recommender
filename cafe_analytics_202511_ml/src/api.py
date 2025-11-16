@@ -1,8 +1,9 @@
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from google.cloud import bigquery
 from sklearn.model_selection import train_test_split
 import pandas as pd
-from contextlib import asynccontextmanager
+import numpy as np
 from src.config import settings
 from src.Get_Logging_Config import get_logger
 
@@ -15,31 +16,25 @@ bq_client = bigquery.Client(project=settings.project_id)
 
 
 def load_and_split_data():
-    """
-    Load data from BigQuery and split into train/test sets.
-    """
+    """Load data from BigQuery and split into train/test sets."""
     try:
-        # SQL query dynamically built from settings
         query = f"""
         SELECT *
         FROM `{settings.project_id}.{settings.dataset}.{settings.model_name}`
         """
         logger.info(f"Executing BigQuery: {query}")
-
         df = bq_client.query(query).to_dataframe()
-        logger.info(f"BigQuery data loaded. Shape: {df.shape}")
+        logger.info(f"BigQuery data loaded successfully. Shape: {df.shape}")
 
         if df.empty:
             raise ValueError("BigQuery returned no data.")
 
-        # Split into train/test sets
         train_df, test_df = train_test_split(
             df,
             test_size=settings.test_size,
             random_state=settings.random_state
         )
-
-        logger.info("Train/test split completed.")
+        logger.info(f"Train/Test split complete: train={len(train_df)}, test={len(test_df)}")
         return train_df, test_df
 
     except Exception as e:
@@ -47,41 +42,46 @@ def load_and_split_data():
         raise RuntimeError("Data Ingestion Failure") from e
 
 
-
 @app.on_event("startup")
 async def startup_event():
-    # Load BigQuery data at startup
-    client = bigquery.Client(project=settings.project_id)
-    query = f"SELECT * FROM `{settings.project_id}.{settings.dataset}.{settings.model_name}`"
-    df = client.query(query).to_dataframe()
-
-    # Split train/test
-    train_df, test_df = train_test_split(df, test_size=settings.test_size, random_state=settings.random_state)
-
-    # Store in app state
+    """Load BigQuery data at startup and store in app state."""
+    logger.info("Loading data from BigQuery...")
+    train_df, test_df = load_and_split_data()
     app.state.train_df = train_df
     app.state.test_df = test_df
-    print(f"Data loaded: train {len(train_df)} rows, test {len(test_df)} rows")
+    logger.info("Data successfully loaded into app state.")
+
+
+def clean_dataframe(df: pd.DataFrame, limit: int) -> pd.DataFrame:
+    """Clean dataframe for JSON serialization and limit rows."""
+    df_sample = df.head(limit).copy()
+    # Replace infinities and NaNs
+    df_sample.replace([np.inf, -np.inf], 0.0, inplace=True)
+    df_sample.fillna(0.0, inplace=True)
+    # Convert timestamps to string (ISO format)
+    for col in df_sample.select_dtypes(include=["datetime", "datetimetz"]).columns:
+        df_sample[col] = df_sample[col].astype(str)
+    return df_sample
+
 
 @app.get("/train")
 async def get_train_data(limit: int = 5):
+    """Return sample of training data."""
     df = getattr(app.state, "train_df", None)
     if df is None:
-        return {"error": "Training data not loaded"}, 500
-    df_sample = df.head(limit).copy()
-    numeric_cols = df_sample.select_dtypes(include=['number']).columns
-    df_sample[numeric_cols] = df_sample[numeric_cols].astype(float).replace([np.inf, -np.inf], 0.0)
-    return df_sample.to_dict(orient="records")
+        return JSONResponse(status_code=500, content={"error": "Training data not loaded"})
+    df_sample = clean_dataframe(df, limit)
+    return JSONResponse(content=df_sample.to_dict(orient="records"))
+
 
 @app.get("/test")
 async def get_test_data(limit: int = 5):
+    """Return sample of test data."""
     df = getattr(app.state, "test_df", None)
     if df is None:
-        return {"error": "Test data not loaded"}, 500
-    df_sample = df.head(limit).copy()
-    numeric_cols = df_sample.select_dtypes(include=['number']).columns
-    df_sample[numeric_cols] = df_sample[numeric_cols].astype(float).replace([np.inf, -np.inf], 0.0)
-    return df_sample.to_dict(orient="records")
+        return JSONResponse(status_code=500, content={"error": "Test data not loaded"})
+    df_sample = clean_dataframe(df, limit)
+    return JSONResponse(content=df_sample.to_dict(orient="records"))
 
 
 if __name__ == "__main__":

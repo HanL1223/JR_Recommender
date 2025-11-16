@@ -44,3 +44,20 @@ requests.exceptions.HTTPError: 404 Client Error: Not Found for url: http://127.0
 2025-11-07 19:58:54 [INFO] src.api: Data successfully loaded into app state.
 2025-11-07 20:03:20 [INFO] src.api: Application shutdown complete.
 2025-11-07 20:03:20 [INFO] src.api: Application shutdown complete.
+2025-11-09 12:19:52 [INFO] src.api: Starting up FastAPI and loading BigQuery data...
+2025-11-09 12:19:52 [INFO] src.api: Executing BigQuery query:
+
+        SELECT *
+        FROM `jr-data-training.dbt_medallion_dev_gold.fact_order_items`
+        
+2025-11-09 12:20:46 [INFO] src.api: BigQuery data loaded successfully. Shape: (572943, 13)
+2025-11-09 12:20:46 [INFO] src.api: Train/Test split complete: train=458354, test=114589
+2025-11-09 12:20:46 [INFO] src.api: Data successfully loaded into app state.
+2025-11-09 12:22:14 [INFO] src.api: Loading data from BigQuery...
+2025-11-09 12:22:14 [INFO] src.api: Executing BigQuery: 
+        SELECT *
+        FROM `jr-data-training.dbt_medallion_dev_gold.fact_order_items`
+        
+2025-11-09 12:23:03 [INFO] src.api: BigQuery data loaded successfully. Shape: (572943, 13)
+2025-11-09 12:23:03 [INFO] src.api: Train/Test split complete: train=458354, test=114589
+2025-11-09 12:23:03 [INFO] src.api: Data successfully loaded into app state.
