@@ -57,7 +57,7 @@ variable "trainees" {
     "user:zibozhao52@gmail.com", # start from 2025-10-27
     "user:harryberlin996@gmail.com", # start from 2025-10-27
     "user:laaron1223@gmail.com", # start from 2025-10-27
-    "user:lzlzyy@hotmail.com", # start from 2025-10-27
+    "user:zzllyu@gmail.com", # start from 2025-10-27
   ]
 }
 
