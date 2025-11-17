@@ -8,5 +8,5 @@
 <p align="center">
   <img src="./assets/medallion_architecture.png" alt="Medallion Architecture" width="100%">
   <br>
-  <em>Figure 2: Medallion Architecture Implemented</em>
+  <em>Figure 2: dbt Models in Medallion Architecture</em>
 </p>
