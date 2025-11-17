@@ -139,7 +139,7 @@ dbt-bigquery
 
 ### Step 4: Start Airflow locally
 
-Start Airflow on your local machine by running:
+Open Docker Desktop and start Airflow on your local machine by running:
 ```
 astro dev start
 ```
