@@ -6,3 +6,5 @@ logs/
 .venv
 *.csv
 venv
+*.log
+*.pyc
