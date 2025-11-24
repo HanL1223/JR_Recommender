@@ -89,7 +89,7 @@ class DataPreparation:
         self.logger.info("Created product_full: product_name + product_variant")
         
         self.df['order_datetime'] = pd.to_datetime(
-    df['order_date'].astype(str) + ' ' + df['order_time'].astype(str)
+    self.df['order_date'].astype(str) + ' ' + self.df['order_time'].astype(str)
 )
         self.logger.info("Created order_datetime from order_date and order_time")
         
@@ -162,10 +162,7 @@ class DataPreparation:
         self.sort_by_datetime()
         
         report = self.generate_cleaning_report()
-        
-        self.logger.info("="*80)
-        self.logger.info("Data is now clean")
-        self.logger.info("="*80)
+    
         return self.df, report
 
 if __name__ == "__main__":

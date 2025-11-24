@@ -113,7 +113,8 @@ class DataAnalyzer:
         self.logger.info("="*80)
         
         self.df['order_datetime'] = pd.to_datetime(
-    df['order_date'].astype(str) + ' ' + df['order_time'].astype(str)
+    self.df['order_date'].astype(str) + ' ' + self.df['order_time'].astype(str)
+
 )
         self.df['hour'] = self.df['order_datetime'].dt.hour
         self.df['day_of_week'] = self.df['order_datetime'].dt.dayofweek
@@ -239,10 +240,6 @@ class DataAnalyzer:
         quality_report = self.check_data_quality()
         feasibility_report = self.analyze_recommendation_feasibility()
         summary = self.generate_summary()
-        
-        self.logger.info("="*80)
-        self.logger.info("STEP 1 COMPLETE")
-        self.logger.info("="*80)
         
         return {
             'structure': structure_info,

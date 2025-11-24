@@ -11,6 +11,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 class OrderLevelFeatureEngineering:
     
     def __init__(self, df: pd.DataFrame):
@@ -25,7 +26,9 @@ class OrderLevelFeatureEngineering:
         self.logger.info("Order-Level Feature Engineering initialized")
         
     def create_user_item_matrix(self) -> 'OrderLevelFeatureEngineering':
-
+        self.logger.info("="*80)
+        self.logger.info("CREATING USER-ITEM INTERACTION MATRIX")
+        self.logger.info("="*80)
         
         interactions = self.df.groupby(['customer_id', 'product_full']).size().reset_index(name='interaction_count')
         
@@ -204,10 +207,11 @@ class OrderLevelFeatureEngineering:
         self.logger.info(f"Unique customers: {self.sequential_data['customer_id'].nunique()}")
         self.logger.info(f"Unique target items: {self.sequential_data['target_item_id'].nunique()}")
         
-        sample = self.sequential_data.iloc[0]
-        self.logger.info(f"\nExample sequence shape: {sample['order_sequence'].shape}")
-        self.logger.info(f"  (sequence_length={sequence_length}, n_items={n_items})")
-        self.logger.info(f"Example target order: {sample['target_order_items']}")
+        if len(self.sequential_data) > 0:
+            sample = self.sequential_data.iloc[0]
+            self.logger.info(f"\nExample sequence shape: {sample['order_sequence'].shape}")
+            self.logger.info(f"  (sequence_length={sequence_length}, n_items={n_items})")
+            self.logger.info(f"Example target order: {sample['target_order_items']}")
         
         return self
     
@@ -389,18 +393,32 @@ class OrderLevelFeatureEngineering:
         
         metadata = self.get_feature_metadata()
         
-        arrays = {
-            'X_train_seq': self.X_train_seq,
-            'X_train_context': self.X_train_context,
-            'y_train': getattr(self, 'y_train_basket', None) or self.y_train,
-            'X_val_seq': self.X_val_seq,
-            'X_val_context': self.X_val_context,
-            'y_val': getattr(self, 'y_val_basket', None) or self.y_val,
-            'X_test_seq': self.X_test_seq,
-            'X_test_context': self.X_test_context,
-            'y_test': getattr(self, 'y_test_basket', None) or self.y_test,
-            'prediction_mode': prediction_mode
-        }
+        if prediction_mode == 'basket':
+            arrays = {
+                'X_train_seq': self.X_train_seq,
+                'X_train_context': self.X_train_context,
+                'y_train': self.y_train_basket,
+                'X_val_seq': self.X_val_seq,
+                'X_val_context': self.X_val_context,
+                'y_val': self.y_val_basket,
+                'X_test_seq': self.X_test_seq,
+                'X_test_context': self.X_test_context,
+                'y_test': self.y_test_basket,
+                'prediction_mode': prediction_mode
+            }
+        else:
+            arrays = {
+                'X_train_seq': self.X_train_seq,
+                'X_train_context': self.X_train_context,
+                'y_train': self.y_train,
+                'X_val_seq': self.X_val_seq,
+                'X_val_context': self.X_val_context,
+                'y_val': self.y_val,
+                'X_test_seq': self.X_test_seq,
+                'X_test_context': self.X_test_context,
+                'y_test': self.y_test,
+                'prediction_mode': prediction_mode
+            }
         
         self.logger.info("="*80)
         self.logger.info("STEP 3 COMPLETE")
@@ -411,6 +429,6 @@ class OrderLevelFeatureEngineering:
 
 
 if __name__ == "__main__":
-    logger.info("Usage:")
     logger.info("  fe = OrderLevelFeatureEngineering(clean_df)")
     logger.info("  arrays, metadata = fe.run_feature_engineering(sequence_length=5, prediction_mode='item')")
+    logger.info("  arrays, metadata = fe.run_feature_engineering(sequence_length=5, prediction_mode='basket')")
