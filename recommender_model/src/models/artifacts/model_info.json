@@ -1,0 +1,57 @@
+{
+  "model_name": "LightGBM_default",
+  "training_date": "2025-11-27T20:20:53.279854",
+  "metrics": {
+    "ndcg@1": 0.9272,
+    "hit_rate@1": 0.9272,
+    "precision@1": 0.9272,
+    "ndcg@3": 0.9638,
+    "hit_rate@3": 0.9912,
+    "precision@3": 0.4483,
+    "ndcg@5": 0.9632,
+    "hit_rate@5": 0.9992,
+    "precision@5": 0.2888,
+    "ndcg@10": 0.9589,
+    "hit_rate@10": 0.9999,
+    "precision@10": 0.1933,
+    "mrr": 0.9593
+  },
+  "params": {
+    "objective": "lambdarank",
+    "metric": "ndcg",
+    "ndcg_eval_at": [
+      1,
+      3,
+      5,
+      10
+    ],
+    "num_leaves": 31,
+    "learning_rate": 0.05,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 5,
+    "min_data_in_leaf": 20,
+    "lambda_l1": 0.1,
+    "lambda_l2": 0.1,
+    "verbose": -1,
+    "seed": 42,
+    "num_boost_round": 500,
+    "early_stopping_rounds": 50,
+    "best_iteration": 1,
+    "n_trees": 1
+  },
+  "n_customers": 919,
+  "n_products": 252,
+  "n_train_samples": 287508,
+  "n_test_samples": 71958,
+  "split_date": "2023-06-04",
+  "tuning_enabled": false,
+  "tuning_trials": 0,
+  "all_models_compared": [
+    "LightGBM_default",
+    "PersonalFreq_s0.2",
+    "PersonalFreq_s0.3",
+    "PersonalFreq_s0.5",
+    "Popularity"
+  ]
+}
