@@ -79,6 +79,30 @@ class LightGBMRanker(BaseRecommender):
         logger.info(f"{self.name} initialized (num_leaves={num_leaves}, lr={learning_rate})")
 
     # -------------------------------------------------------------------------
+    #                     FACTORY METHOD FOR OPTUNA TUNING
+    # -------------------------------------------------------------------------
+    @classmethod
+    def from_params(cls, params: Dict[str, Any]) -> "LightGBMRanker":
+        """
+        Factory method used by Optuna to build a model instance from a
+        hyperparameter dictionary.
+
+        Any missing parameters fall back to the class defaults.
+        """
+        return cls(
+            num_leaves=params.get("num_leaves", 31),
+            learning_rate=params.get("learning_rate", 0.05),
+            feature_fraction=params.get("feature_fraction", 0.8),
+            bagging_fraction=params.get("bagging_fraction", 0.8),
+            bagging_freq=params.get("bagging_freq", 5),
+            min_data_in_leaf=params.get("min_data_in_leaf", 20),
+            lambda_l1=params.get("lambda_l1", 0.1),
+            lambda_l2=params.get("lambda_l2", 0.1),
+            num_boost_round=params.get("num_boost_round", 500),
+            early_stopping_rounds=params.get("early_stopping_rounds", 50),
+        )
+
+    # -------------------------------------------------------------------------
     #                                FIT MODEL
     # -------------------------------------------------------------------------
     def fit(
@@ -93,7 +117,9 @@ class LightGBMRanker(BaseRecommender):
 
         required_cols = {"customer_id", "order_idx", "label"}
         if not required_cols.issubset(train_df.columns):
-            raise ValueError(f"Training data missing required columns: {required_cols - set(train_df.columns)}")
+            raise ValueError(
+                f"Training data missing required columns: {required_cols - set(train_df.columns)}"
+            )
 
         # sort by grouping keys
         train_df = train_df.sort_values(["customer_id", "order_idx"])
@@ -131,7 +157,9 @@ class LightGBMRanker(BaseRecommender):
             valid_sets.append(valid_dataset)
             valid_names.append("valid")
 
-        logger.info(f"Training with {len(X_train):,} samples and {len(train_groups):,} ranking groups...")
+        logger.info(
+            f"Training with {len(X_train):,} samples and {len(train_groups):,} ranking groups..."
+        )
 
         self.model = lgb.train(
             self.params,

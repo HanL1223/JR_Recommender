@@ -35,6 +35,7 @@ class CustomerProfile:
     preferred_category: Optional[str]
     preferred_size: Optional[str]
     segment: str  # derived from first order
+    
 
 class BaseFeatureExtractor(ABC):
 

@@ -1,154 +1,169 @@
 """
-TRAINING PIPELINE — CLEAN, MODULAR, EXTENDABLE
+TRAINING PIPELINE
+=================
+Clean end-to-end trainer aligned with ColdStartHandler + RecommenderPredictor.
 """
 
 import logging
 from pathlib import Path
-from datetime import datetime
-import json
 import pickle
+import json
+from datetime import datetime
 
-from src.data import DataLoader, DataPreprocessor
-from src.features import (
-    ProductFeatureExtractor,
-    CustomerFeatureExtractor,
-    TrainingDataBuilder
-)
-from src.training import TemporalDataSplitter
-from src.evaluation import RankingMetrics
-from src.training.tuner import HyperparameterTuner
+from src.data_ingestion.data_loader import IngestionFactory, DataLoader
+from src.data_ingestion.data_validator import ValidationFactory, DataValidator
+from src.data_ingestion.data_preprocessor import PreprocessingFactory
 
-from src.models import (
-    PopularityRecommender,
-    PersonalFrequencyRecommender,
-    LightGBMRanker,
-    XGBoostRanker,
-)
+from src.features.customer_features import CustomerFeatureExtractor
+from src.features.product_features import ProductFeatureExtractor
+from src.features.training_data_builder import TrainingDataBuilder
+
+from src.training.data_splitter import TemporalDataSplitter
+from src.models.baseline_models import PopularityRecommender, PersonalFrequencyRecommender
+from src.models.lightgbm_ranker import LightGBMRanker
+from src.training.hyperparameter_tuning import HyperparameterTuner
+from src.evaluation.metrics import RankingMetrics
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-# ---------------------------------------------------------------------------
-# MAIN PIPELINE
-# ---------------------------------------------------------------------------
-def train_pipeline(data_path: str,
-                   do_tuning: bool = False,
-                   n_trials: int = 20,
-                   timeout: int = 300):
+def train(
+    data_path: str,
+    do_tuning: bool = False,
+    n_trials: int = 20,
+    timeout: int = 300
+):
+    """
+    Trains the best recommender model and stores all components
+    required for predictor + cold-start inference.
+    """
 
     # ----------------------------------------------------------------------
-    # LOAD + PREPROCESS + FEATURE EXTRACTION
+    # 1. INGESTION
     # ----------------------------------------------------------------------
-    raw = DataLoader().load_csv(data_path)
-    prepared = DataPreprocessor(min_orders=2).transform(raw.transactions)
+    ingestion = IngestionFactory.create(
+        source_type="csv",
+        file_path=data_path,
+        date_columns=["order_date", "first_order_date", "last_order_date"],
+    )
+    df = DataLoader(ingestion).load().transactions
 
-    product_features = ProductFeatureExtractor().extract(prepared)
-    customer_profiles = CustomerFeatureExtractor().extract(prepared)
-    training_data = TrainingDataBuilder().build(prepared, product_features, customer_profiles)
+    # ----------------------------------------------------------------------
+    # 2. VALIDATION
+    # ----------------------------------------------------------------------
+    validator = DataValidator(
+        rules=ValidationFactory.default_rules(),
+        strict_mode=False
+    )
+    report = validator.validate(df)
 
+    if not report.is_valid:
+        raise ValueError("Dataset validation failed")
+
+    # ----------------------------------------------------------------------
+    # 3. PREPROCESSING
+    # ----------------------------------------------------------------------
+    prepared_data = PreprocessingFactory.create(
+        method="sequence",
+        min_orders=2
+    ).transform(df)
+
+    # ----------------------------------------------------------------------
+    # 4. FEATURE EXTRACTION
+    # ----------------------------------------------------------------------
+    customer_profiles = CustomerFeatureExtractor().extract(prepared_data)
+    product_features = ProductFeatureExtractor().extract(prepared_data)
+
+    # ----------------------------------------------------------------------
+    # 5. TRAINING DATA
+    # ----------------------------------------------------------------------
+    builder = TrainingDataBuilder(negative_ratio=5)
+    training_data = builder.build(
+        prepared_data=prepared_data,
+        product_features=product_features,
+        customer_profiles=customer_profiles
+    )
+
+    # ----------------------------------------------------------------------
+    # 6. TEMPORAL SPLIT
+    # ----------------------------------------------------------------------
     split = TemporalDataSplitter(test_ratio=0.2).split(training_data)
 
     train_df = split.train_df
     test_df = split.test_df
     feature_names = split.feature_names
 
-    logger.info(f"Train samples: {split.n_train_samples:,}")
-    logger.info(f"Test samples: {split.n_test_samples:,}")
-
-    evaluator = RankingMetrics(k_values=[1, 3, 5, 10])
+    evaluator = RankingMetrics(k_values=[1, 3, 5])
     tuner = HyperparameterTuner(n_trials=n_trials, timeout=timeout)
 
     # ----------------------------------------------------------------------
-    # CANDIDATE MODELS (easy to add more)
+    # 7. CANDIDATE MODELS
     # ----------------------------------------------------------------------
-    candidate_models = [
+    candidates = [
         ("Popularity", PopularityRecommender(), False),
-        ("PersonalFreq_s0.2", PersonalFrequencyRecommender(0.2), False),
-        ("PersonalFreq_s0.3", PersonalFrequencyRecommender(0.3), False),
-        ("PersonalFreq_s0.5", PersonalFrequencyRecommender(0.5), False),
+        ("PersonalFreq_0.3", PersonalFrequencyRecommender(0.3), False),
         ("LightGBM_default", LightGBMRanker(), True),
-        ("XGBoost_default", XGBoostRanker(), True),
     ]
 
     results = []
 
-    # ----------------------------------------------------------------------
-    # TRAIN + EVALUATE ALL MODELS
-    # ----------------------------------------------------------------------
-    for name, model, supports_tuning in candidate_models:
-        try:
-            logger.info(f"\nTraining: {name}")
-            model.fit(train_df, feature_names, valid_df=test_df)
-            metrics = evaluator.evaluate(model, test_df, feature_names)
+    for name, model, supports_tuning in candidates:
+        logger.info(f"Training model: {name}")
+        model.fit(train_df, feature_names, valid_df=test_df)
 
-            results.append({
-                "name": name,
-                "model": model,
-                "metrics": metrics,
-                "params": model.get_params(),
-                "supports_tuning": supports_tuning
-            })
+        metrics = evaluator.evaluate(model, test_df, feature_names)
 
-            logger.info(f"{name} → NDCG@3 = {metrics['ndcg@3']:.4f}")
+        results.append({
+            "name": name,
+            "model": model,
+            "supports_tuning": supports_tuning,
+            "metrics": metrics
+        })
 
-        except Exception as e:
-            logger.warning(f"⚠️ Model {name} failed: {e}")
+        logger.info(f"{name} NDCG@3 = {metrics.metrics['ndcg@3']:.4f}")
 
     # ----------------------------------------------------------------------
-    # SELECT BEST BASE MODEL
+    # 8. SELECT BEST BASE MODEL
     # ----------------------------------------------------------------------
-    best_base = max(results, key=lambda r: r["metrics"]["ndcg@3"])
-    logger.info(f"\n🏆 Best base model: {best_base['name']} "
-                f"(NDCG@3={best_base['metrics']['ndcg@3']:.4f})")
+    best = max(results, key=lambda r: r["metrics"].metrics["ndcg@3"])
+    best_model = best["model"]
+    best_name = best["name"]
 
-    final_model = best_base["model"]
-    final_params = best_base["params"]
-
-    # ----------------------------------------------------------------------
-    # OPTIONAL — HYPERPARAMETER TUNING
-    # ----------------------------------------------------------------------
-    if do_tuning and best_base["supports_tuning"]:
-
-        logger.info(f"\n🔧 Tuning model: {best_base['name']}")
-
-        if "LightGBM" in best_base["name"]:
-            tuning = tuner.tune_lightgbm(split)
-            final_model = LightGBMRanker.from_params(tuning.best_params)
-        elif "XGBoost" in best_base["name"]:
-            tuning = tuner.tune_xgboost(split)
-            final_model = XGBoostRanker.from_params(tuning.best_params)
-        else:
-            tuning = None
-
-        if tuning:
-            logger.info(f"Best tuned NDCG@3={tuning.best_score:.4f}")
-            final_model.fit(train_df, feature_names, valid_df=test_df)
-            final_params = tuning.best_params
+    logger.info(f"Best base model: {best_name}")
 
     # ----------------------------------------------------------------------
-    # SAVE FINAL MODEL
+    # 9. HYPERPARAMETER TUNING (OPTIONAL)
     # ----------------------------------------------------------------------
-    output_dir = Path("models/artifacts")
-    output_dir.mkdir(parents=True, exist_ok=True)
+    if do_tuning and best["supports_tuning"]:
+        tuning_result = tuner.tune_lightgbm(split)
+        best_model = LightGBMRanker.from_params(tuning_result.best_params)
+        best_model.fit(train_df, feature_names, valid_df=test_df)
+
+        tuned_metrics = evaluator.evaluate(best_model, test_df, feature_names)
+    else:
+        tuned_metrics = best["metrics"]
+
+    # ----------------------------------------------------------------------
+    # 10. SAVE ARTIFACTS FOR INFERENCE
+    # ----------------------------------------------------------------------
+    out_dir = Path("models/artifacts")
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     bundle = {
-        "model": final_model,
-        "model_name": best_base["name"],
+        "model": best_model,
+        "model_name": best_name,
         "feature_names": feature_names,
-        "metrics": best_base["metrics"],
-        "params": final_params,
+        "metrics": tuned_metrics.metrics,
+        "customer_profiles": customer_profiles,
+        "product_features": product_features,
+        "prepared_data": prepared_data,
         "training_date": datetime.now().isoformat(),
-        "tuned": do_tuning,
     }
 
-    with open(output_dir / "recommender.pkl", "wb") as f:
+    with open(out_dir / "recommender.pkl", "wb") as f:
         pickle.dump(bundle, f)
 
-    with open(output_dir / "model_info.json", "w") as f:
-        json.dump(bundle, f, indent=2)
-
-    logger.info("\n Training pipeline complete.")
-    logger.info(f"Best model saved to: {output_dir/'recommender.pkl'}")
+    logger.info("Training pipeline complete. Saved recommender.pkl")
 
     return bundle
