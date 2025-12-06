@@ -34,6 +34,9 @@ PROJECT_STRUCTURE = {
         "__init__.py",
         "predictor.py",
         "cold_start.py"
+    ],
+    "src/tuning":[
+        "model_tuning_strategy.py"
     ]
 }
 

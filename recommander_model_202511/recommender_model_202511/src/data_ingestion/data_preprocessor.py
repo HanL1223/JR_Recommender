@@ -144,7 +144,7 @@ class PreprocessingFactory:
         method = method.lower()
 
         if method == "sequence":
-            min_orders = kwargs.pop("min_orders", 2)  #NEED TO FIX
+            min_orders = kwargs.pop("min_orders", 2)  
             return SequencePreprocessor(
                 min_orders=kwargs.get("min_orders",2),
                 **kwargs

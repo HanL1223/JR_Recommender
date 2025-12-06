@@ -1,7 +1,7 @@
 """
 Load raw data from various source
 -Local CSV
-- BigQuery
+-BigQuery
 ...
 """
 from abc import ABC, abstractmethod
@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-#frozen?
 class RawData:
     """
     Container for raw data and data attributes
