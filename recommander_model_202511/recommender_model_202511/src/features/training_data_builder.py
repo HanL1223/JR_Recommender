@@ -1,3 +1,20 @@
+"""
+Training Data Builder
+=====================
+
+Builds pointwise training samples for ranking models from PreparedData.
+
+New personalised features added:
+ - log_history_count
+ - recent_purchase_flag
+ - frequency_rank_pct
+ - stronger time_decay_score
+ - popularity_scaled (reduced influence)
+ - adjusted_popularity (milder penalty)
+
+Fully aligned with inference-side FeatureMatrixBuilder.
+"""
+
 import logging
 import numpy as np
 import pandas as pd
@@ -7,9 +24,7 @@ from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
-# ----------------------------------------------------------------------
-# TrainingData Container
-# ----------------------------------------------------------------------
+
 @dataclass
 class TrainingData:
     samples_df: pd.DataFrame
@@ -18,19 +33,21 @@ class TrainingData:
     n_negative: int
     product_to_idx: Dict[str, int]
     idx_to_product: Dict[int, str]
-    encoders: Dict[str, Dict[str, int]]  # segment, archetype, category
+    encoders: Dict[str, Dict[str, int]]
 
 
 # ----------------------------------------------------------------------
-# Main TrainingDataBuilder
+# Updated Feature Names
 # ----------------------------------------------------------------------
 class TrainingDataBuilder:
 
     FEATURE_NAMES = [
-        # History features
-        "in_history", "history_count", "history_freq", "orders_since_last_purchase",
+        # History
+        "in_history", "history_count", "log_history_count", "history_freq",
+        "frequency_rank_pct", "recent_purchase_flag",
+        "orders_since_last_purchase",
 
-        # Affinity and variant features
+        # Affinity
         "time_decay_score", "never_purchased",
         "category_affinity", "is_preferred_category",
         "size_affinity", "is_preferred_size",
@@ -39,24 +56,21 @@ class TrainingDataBuilder:
         # Time features
         "hour_of_day", "day_of_week", "days_since_last_order",
 
-        # Customer features
+        # Customer-level
         "history_length", "avg_basket_size", "avg_spend",
         "segment_encoded", "archetype_encoded",
 
-        # Global features
-        "popularity", "adjusted_popularity", "category_encoded",
+        # Product-level global
+        "popularity_scaled", "adjusted_popularity", "category_encoded",
     ]
 
     def __init__(self, negative_ratio: int = 5, random_seed: int = 42):
         self.negative_ratio = negative_ratio
         np.random.seed(random_seed)
-        logger.info(f"TrainingDataBuilder initialised (negative_ratio={negative_ratio})")
+        logger.info("TrainingDataBuilder initialised (negative_ratio=%s)", negative_ratio)
 
     # ------------------------------------------------------------------
-    # MASTER ENTRYPOINT
-    # ------------------------------------------------------------------
-    def build(self, prepared_data, product_features, customer_profiles):
-
+    def build(self, prepared_data, product_features, customer_profiles) -> TrainingData:
         logger.info("Building training samples...")
 
         samples = []
@@ -64,16 +78,14 @@ class TrainingDataBuilder:
         category_map = prepared_data.category_map or {}
         popularity = product_features.popularity or {}
 
-        # --------------------------
-        # BUILD ENCODERS (returned for inference)
-        # --------------------------
+        # Encoders for inference
         categories = sorted(set(category_map.values()))
-        cat_to_idx = {cat: i for i, cat in enumerate(categories)}
+        cat_to_idx = {c: i for i, c in enumerate(categories)}
 
         segment_to_idx = {"New": 1, "Regular": 2, "VIP": 3}
         archetype_to_idx = {
             "casual": 0, "parent": 1, "coffee_purist": 2,
-            "latte_lover": 3, "health_conscious": 4, "food_focused": 5
+            "latte_lover": 3, "health_conscious": 4, "food_focused": 5,
         }
 
         encoders = {
@@ -82,17 +94,15 @@ class TrainingDataBuilder:
             "archetype": archetype_to_idx,
         }
 
-        # --------------------------
-        # ITERATE THROUGH CUSTOMERS
-        # --------------------------
-        for idx, (customer_id, orders) in enumerate(prepared_data.customer_histories.items()):
+        # Loop customers
+        for idx, (cid, orders) in enumerate(prepared_data.customer_histories.items()):
             if len(orders) < 2:
                 continue
 
             if idx % 200 == 0:
-                logger.info(f"Processing customer {idx}/{len(prepared_data.customer_histories)}")
+                logger.info("Processing %s/%s customers", idx, len(prepared_data.customer_histories))
 
-            profile = customer_profiles.get(customer_id)
+            profile = customer_profiles.get(cid)
             archetype = profile.archetype if profile else "casual"
             archetype_encoded = archetype_to_idx.get(archetype, 0)
 
@@ -101,62 +111,62 @@ class TrainingDataBuilder:
 
             samples.extend(
                 self.build_customer_samples(
-                    customer_id, orders, product_set,
+                    cid, orders, product_set,
                     popularity, category_map, cat_to_idx,
                     segment_encoded, archetype_encoded
                 )
             )
 
-        # --------------------------
-        # Convert samples to DataFrame
-        # --------------------------
+        if not samples:
+            raise ValueError("TrainingDataBuilder produced zero samples!")
+
         df = pd.DataFrame(samples).replace([np.inf, -np.inf], 0).fillna(0)
-        # --- Ensure order_date exists AND is datetime ---
-        if "order_date" not in df.columns:
-            raise ValueError("TrainingDataBuilder error: order_date missing from samples_df")
+
+        # Required for training pipeline
+        required = {"order_idx", "order_date", "label", "customer_id", "product"}
+        missing = required - set(df.columns)
+        if missing:
+            raise ValueError(f"TrainingDataBuilder missing required columns: {missing}")
 
         df["order_date"] = pd.to_datetime(df["order_date"])
-        n_positive = int(df["label"].sum())
-        n_negative = len(df) - n_positive
 
-        logger.info(f"Training samples built: {len(df):,}")
-        logger.info(f"Positive={n_positive:,}  Negative={n_negative:,}")
+        n_pos = int(df["label"].sum())
+        n_neg = len(df) - n_pos
 
-        # Product index tables
+        logger.info("Built %s samples (pos=%s neg=%s)", len(df), n_pos, n_neg)
+
         product_to_idx = {p: i for i, p in enumerate(prepared_data.product_list)}
         idx_to_product = {i: p for p, i in product_to_idx.items()}
 
         return TrainingData(
             samples_df=df,
             feature_names=self.FEATURE_NAMES,
-            n_positive=n_positive,
-            n_negative=n_negative,
+            n_positive=n_pos,
+            n_negative=n_neg,
             product_to_idx=product_to_idx,
             idx_to_product=idx_to_product,
-            encoders=encoders,   # <-- IMPORTANT
+            encoders=encoders,
         )
 
     # ------------------------------------------------------------------
-    # Build samples for a single customer's history
-    # ------------------------------------------------------------------
     def build_customer_samples(
-        self, customer_id, orders, product_set, popularity,
+        self, cid, orders, product_set, popularity,
         category_map, cat_to_idx, segment_encoded, archetype_encoded
     ):
         samples = []
 
         for order_idx in range(1, len(orders)):
-            past_orders = orders[:order_idx]
-            current_order = orders[order_idx]
+            past = orders[:order_idx]
+            curr = orders[order_idx]
 
-            target_basket = {p for p in current_order["basket"] if isinstance(p, str)}
-            if not target_basket:
+            basket = {p for p in curr["basket"] if isinstance(p, str)}
+            if not basket:
                 continue
 
-            past_feats = self.compute_past_features(past_orders, category_map)
-            time_feats = self.compute_time_features(current_order, past_orders)
+            past_feats = self.compute_past_features(past, category_map)
+            time_feats = self.compute_time_features(curr, past)
 
-            customer_feats = {
+            cust_feats = {
                 "history_length": order_idx,
                 "avg_basket_size": past_feats["avg_basket_size"],
                 "avg_spend": past_feats["avg_spend"],
@@ -164,76 +174,94 @@ class TrainingDataBuilder:
                 "archetype_encoded": archetype_encoded,
             }
 
-            def make(product, label):
-                return self.create_product_sample(
-                    customer_id, product, label, order_idx,
-                    current_order["order_date"], past_feats,
-                    time_feats, customer_feats, popularity,
-                    category_map, cat_to_idx
+            # Positive
+            for p in basket:
+                samples.append(
+                    self.create_sample(
+                        cid, p, 1, order_idx, curr["order_date"],
+                        past_feats, time_feats, cust_feats,
+                        popularity, category_map, cat_to_idx
+                    )
                 )
 
-            # Positive samples
-            for p in target_basket:
-                samples.append(make(p, 1))
-
-            # Negative samples
-            negative_pool = list(product_set - target_basket)
-            n_neg = min(len(target_basket) * self.negative_ratio, len(negative_pool))
+            # Negative
+            neg_pool = list(product_set - basket)
+            n_neg = min(len(basket) * self.negative_ratio, len(neg_pool))
 
             if n_neg > 0:
-                weights = np.array([popularity.get(p, 0.0001) for p in negative_pool])
-                negative_choices = np.random.choice(
-                    negative_pool, size=n_neg, replace=False, p=weights / weights.sum()
-                )
-                for p in negative_choices:
-                    samples.append(make(p, 0))
+                weights = np.array([popularity.get(p, 0.0001) for p in neg_pool])
+                weights /= weights.sum()
+                negs = np.random.choice(neg_pool, size=n_neg, replace=False, p=weights)
 
+                for p in negs:
+                    samples.append(
+                        self.create_sample(
+                            cid, p, 0, order_idx, curr["order_date"],
+                            past_feats, time_feats, cust_feats,
+                            popularity, category_map, cat_to_idx
+                        )
+                    )
         return samples
 
     # ------------------------------------------------------------------
-    # Create training sample row
-    # ------------------------------------------------------------------
-    def create_product_sample(
-        self, customer_id, product, label, order_idx, order_date,
-        past_feats, time_feats, customer_feats, popularity, category_map, cat_to_idx
+    def create_sample(
+        self, cid, product, label, order_idx, order_date,
+        past, time, cust, popularity, category_map, cat_to_idx
     ):
-        pf = past_feats
+        # --- History ---
+        hist_count = past["past_product_counts"].get(product, 0)
+        history_freq = hist_count / max(past["n_orders"], 1)
+        log_history = np.log1p(hist_count)
 
-        in_hist = int(product in pf["past_products"])
-        hist_count = pf["past_product_counts"].get(product, 0)
-        hist_freq = hist_count / max(pf["n_orders"], 1)
+        in_hist = int(product in past["past_products"])
 
-        last_idx = pf["past_product_last_idx"].get(product, -1)
-        orders_since = (order_idx - last_idx - 1) if last_idx >= 0 else 999
-        time_decay = np.exp(-0.1 * orders_since) if in_hist else 0
+        last_idx = past["past_product_last_idx"].get(product, -1)
+        if last_idx >= 0:
+            orders_since = order_idx - last_idx - 1
+        else:
+            orders_since = 999
 
+        recent_flag = int(last_idx >= max(0, order_idx - 3))
+
+        # Stronger time decay
+        time_decay = np.exp(-0.3 * orders_since) if in_hist else 0.0
+
+        # Frequency pct (normalised by customer's max freq)
+        freq_pct = hist_count / max(past["max_product_count"], 1)
+
+        # --- Category & Size ---
         category = category_map.get(product, "Unknown")
-        cat_aff = pf["past_categories"].get(category, 0) / max(pf["total_items"], 1)
-        is_pref_cat = int(category == pf["preferred_category"])
+        cat_aff = past["past_categories"].get(category, 0) / max(past["total_items"], 1)
+        is_pref_cat = int(category == past["preferred_category"])
 
         size = self.extract_size(product)
-        size_aff = pf["past_sizes"].get(size, 0) / max(pf["total_items"], 1)
-        is_pref_size = int(size == pf["preferred_size"])
+        size_aff = past["past_sizes"].get(size, 0) / max(past["total_items"], 1)
+        is_pref_size = int(size == past["preferred_size"])
 
         base = self.get_base_product(product)
-        has_variant = int(pf["past_base_products"].get(base, 0) > 0)
+        has_variant = int(past["past_base_products"].get(base, 0) > 0)
 
-        pop = popularity.get(product, 0)
-        adj_pop = pop * (0.3 if orders_since > 3 and not in_hist else 1)
+        # --- Popularity (reduced) ---
+        pop_scaled = popularity.get(product, 0) * 0.1
+        adjusted_pop = pop_scaled * (0.5 if orders_since > 3 and not in_hist else 1)
 
         return {
-            "customer_id": customer_id,
+            "customer_id": cid,
             "product": product,
-            "order_date": order_date,     # <-- REQUIRED FOR TEMPORAL SPLIT
             "label": label,
+            "order_idx": order_idx,
+            "order_date": order_date,
 
             # History
             "in_history": in_hist,
             "history_count": hist_count,
-            "history_freq": hist_freq,
+            "log_history_count": log_history,
+            "history_freq": history_freq,
+            "frequency_rank_pct": freq_pct,
+            "recent_purchase_flag": recent_flag,
             "orders_since_last_purchase": min(orders_since, 100),
 
-            # Affinity/variant
+            # Affinity
             "time_decay_score": time_decay,
             "never_purchased": int(not in_hist),
             "category_affinity": cat_aff,
@@ -242,23 +270,20 @@ class TrainingDataBuilder:
             "is_preferred_size": is_pref_size,
             "has_bought_variant": has_variant,
 
-            # Time features
-            **time_feats,
+            # Time
+            **time,
+            # Customer
+            **cust,
 
-            # Customer features
-            **customer_feats,
-
-            # Global product stats
-            "popularity": pop,
-            "adjusted_popularity": adj_pop,
+            # Global
+            "popularity_scaled": pop_scaled,
+            "adjusted_popularity": adjusted_pop,
             "category_encoded": cat_to_idx.get(category, 0),
         }
 
     # ------------------------------------------------------------------
-    # Utility functions (kept consistent with inference builder)
-    # ------------------------------------------------------------------
-    def extract_size(self, product):
-        p = product.lower()
+    def extract_size(self, p):
+        p = p.lower()
         if "extra large" in p: return "XL"
         if "large" in p: return "L"
         if "regular" in p: return "R"
@@ -268,30 +293,32 @@ class TrainingDataBuilder:
     def get_base_product(self, product):
         return product.split(" (")[0] if " (" in product else product
 
-    def compute_time_features(self, current_order, past_orders):
-        hour = int(current_order.get("order_time", "12:00:00").split(":")[0])
+    # ------------------------------------------------------------------
+    def compute_time_features(self, curr, past):
+        hour = int(curr.get("order_time", "12:00:00").split(":")[0])
+        dow = curr["order_date"].dayofweek
 
-        day_of_week = current_order["order_date"].dayofweek
-
-        if past_orders:
-            last_date = past_orders[-1]["order_date"]
-            days_since = min((current_order["order_date"] - last_date).days, 365)
+        if past:
+            last_date = past[-1]["order_date"]
+            days = (curr["order_date"] - last_date).days
+            days = min(max(days, 0), 365)
         else:
-            days_since = 0
+            days = 0
 
         return {
             "hour_of_day": hour,
-            "day_of_week": day_of_week,
-            "days_since_last_order": max(days_since, 0)
+            "day_of_week": dow,
+            "days_since_last_order": days,
         }
 
+    # ------------------------------------------------------------------
     def compute_past_features(self, past_orders, category_map):
         past_products = set()
         product_counts = Counter()
         last_idx = {}
-        past_categories = Counter()
-        past_sizes = Counter()
-        past_base = Counter()
+        cat_counts = Counter()
+        size_counts = Counter()
+        base_counts = Counter()
 
         total_items = 0
         total_spend = 0
@@ -307,30 +334,33 @@ class TrainingDataBuilder:
                 last_idx[p] = i
 
                 cat = category_map.get(p, "Unknown")
-                past_categories[cat] += 1
+                cat_counts[cat] += 1
 
                 size = self.extract_size(p)
-                past_sizes[size] += 1
+                size_counts[size] += 1
 
                 base = self.get_base_product(p)
-                past_base[base] += 1
+                base_counts[base] += 1
 
                 total_items += 1
 
             total_spend += order.get("order_total", 0)
             basket_sizes.append(order.get("basket_size", len(order["basket"])))
 
+        max_count = max(product_counts.values()) if product_counts else 1
+
         return {
             "past_products": past_products,
             "past_product_counts": product_counts,
             "past_product_last_idx": last_idx,
-            "past_categories": past_categories,
-            "past_sizes": past_sizes,
-            "past_base_products": past_base,
+            "past_categories": cat_counts,
+            "past_sizes": size_counts,
+            "past_base_products": base_counts,
             "total_items": total_items,
             "n_orders": len(past_orders),
+            "max_product_count": max_count,
             "avg_basket_size": np.mean(basket_sizes) if basket_sizes else 0,
             "avg_spend": total_spend / len(past_orders) if past_orders else 0,
-            "preferred_category": past_categories.most_common(1)[0][0] if past_categories else "Unknown",
-            "preferred_size": past_sizes.most_common(1)[0][0] if past_sizes else "unknown",
+            "preferred_category": cat_counts.most_common(1)[0][0] if cat_counts else "Unknown",
+            "preferred_size": size_counts.most_common(1)[0][0] if size_counts else "unknown",
         }

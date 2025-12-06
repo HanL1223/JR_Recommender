@@ -21,7 +21,7 @@ from src.features.training_data_builder import TrainingDataBuilder
 from src.training.data_splitter import TemporalDataSplitter
 from src.models.baseline_models import PopularityRecommender, PersonalFrequencyRecommender
 from src.models.lightgbm_ranker import LightGBMRanker
-from src.training.hyperparameter_tuning import HyperparameterTuner
+from recommander_model_202511.recommender_model_202511.src.tuning.hyperparameter_tuning import HyperparameterTuner
 from src.evaluation.metrics import RankingMetrics
 
 logger = logging.getLogger(__name__)

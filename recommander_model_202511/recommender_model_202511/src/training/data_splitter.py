@@ -1,10 +1,15 @@
 import logging
-import pandas as pd
 from dataclasses import dataclass
 from typing import List
 
+import pandas as pd
+
 logger = logging.getLogger(__name__)
 
+
+# =====================================================================
+#                           SPLIT DATA CLASS
+# =====================================================================
 @dataclass
 class SplitData:
     train_df: pd.DataFrame
@@ -30,65 +35,82 @@ class SplitData:
     new_customers_test: int
 
 
-#Train/Val/Test Data splitter
+# =====================================================================
+#                     TEMPORAL TRAIN/VAL/TEST SPLITTER
+# =====================================================================
 class TemporalDataSplitter:
     """
-    Chronological (time-based) train/test splitting.
-    - Train on the past
-    - Validate on the intermediate period
-    - Test on the future
+    Chronological (time-based) train/valid/test splitter.
+
+    Ensures:
+    - No rows are lost
+    - Required ranking columns are preserved (customer_id, order_idx)
+    - Non-overlapping time windows
     """
 
-    def __init__(self, 
-                 valid_ratio: float = 0.1,
-                 test_ratio: float = 0.2):
+    def __init__(self, valid_ratio: float = 0.1, test_ratio: float = 0.2):
+        if valid_ratio < 0 or test_ratio < 0 or (valid_ratio + test_ratio) >= 1:
+            raise ValueError("valid_ratio + test_ratio must be < 1")
+
         self.valid_ratio = valid_ratio
         self.test_ratio = test_ratio
+
         logger.info(
             f"TemporalDataSplitter initialized (valid_ratio={valid_ratio}, "
             f"test_ratio={test_ratio})"
         )
 
+    # ------------------------------------------------------------------
     def split(self, training_data, date_column: str = "order_date") -> SplitData:
         logger.info("Performing temporal train/valid/test split")
 
         df = training_data.samples_df.copy()
 
-        # Ensure date column exists
-        if date_column not in df.columns:
-            raise KeyError(f"date_column '{date_column}' not found in training dataset")
+        # ----------------------------------------------
+        # Validate required columns
+        # ----------------------------------------------
+        required_cols = {"customer_id", "product", "label", "order_idx", date_column}
+        missing = required_cols - set(df.columns)
+        if missing:
+            raise KeyError(f"Missing required training columns: {missing}")
 
-        # Ensure datetime format
+        # Ensure correct type
         if not pd.api.types.is_datetime64_any_dtype(df[date_column]):
             df[date_column] = pd.to_datetime(df[date_column])
-        # Sort in chronologically order
+
+        # Sort chronologically
         df = df.sort_values(date_column)
 
+        # ----------------------------------------------
+        # Compute split indices
+        # ----------------------------------------------
         n = len(df)
-        idx_valid = int(n * (1 - self.test_ratio - self.valid_ratio)) # validation index begin at 70% of dataset
-        idx_test = int(n * (1 - self.test_ratio)) #test index begin at 80% of dataset
+        idx_train_end = int(n * (1 - self.valid_ratio - self.test_ratio))
+        idx_valid_end = int(n * (1 - self.test_ratio))
 
-        split_date_train = df[date_column].iloc[idx_valid]
-        split_date_valid = df[date_column].iloc[idx_test]
+        split_date_train = df[date_column].iloc[idx_train_end]
+        split_date_valid = df[date_column].iloc[idx_valid_end]
 
         logger.info(f"Train split date: {split_date_train}")
         logger.info(f"Valid split date: {split_date_valid}")
 
-        #Spliting into dataframe
+        # ----------------------------------------------
+        # Slice splits (non-overlapping)
+        # ----------------------------------------------
+        train_df = df.iloc[:idx_train_end].copy()
+        valid_df = df.iloc[idx_train_end:idx_valid_end].copy()
+        test_df = df.iloc[idx_valid_end:].copy()
 
-        train_df = df[df[date_column] < split_date_train].copy()
-        valid_df = df[
-            (df[date_column] >= split_date_train) &
-            (df[date_column] < split_date_valid)
-        ].copy()
-        test_df = df[df[date_column] >= split_date_valid].copy()
-
-
-        #Stats
+        # ----------------------------------------------
+        # Stats needed for SplitData
+        # ----------------------------------------------
         train_customers = set(train_df.customer_id.unique())
         valid_customers = set(valid_df.customer_id.unique())
         test_customers = set(test_df.customer_id.unique())
 
+        # ----------------------------------------------
+        # Return packaged split
+        # ----------------------------------------------
         return SplitData(
             train_df=train_df,
             valid_df=valid_df,

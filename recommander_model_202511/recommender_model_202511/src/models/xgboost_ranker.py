@@ -49,7 +49,7 @@ class XGBoostRanker(BaseRecommender):
         min_child_weight: int = 1,
         reg_alpha: float = 0.0,
         reg_lambda: float = 1.0,
-        objective: str = "rank:pairwise",  # or "rank:ndcg"
+        objective: str = "rank:ndcg",  # or "rank:ndcg"
         early_stopping_rounds: int = 50,
         verbosity: int = 0
     ):
@@ -76,6 +76,7 @@ class XGBoostRanker(BaseRecommender):
         self.model = None
         self.feature_names: List[str] = []
         self._is_fitted = False
+        self.is_ml_model = True
 
         logger.info(f"XGBoostRanker initialized (max_depth={max_depth}, lr={learning_rate})")
 

@@ -74,22 +74,25 @@ class RankingMetrics:
     # Prediction handling for any model
     # -------------------------------------
     def _predict_scores(self, model, df, feature_names):
-        """Handles both ML models and baseline models."""
-        if hasattr(model, "predict_df"):
-            logger.info("Using predict_df (ML model)")
-            return model.predict_df(df)
 
-        # Baseline models → must score row by row
+        # Detect true ML models → they declare `is_ml_model = True`
+        if getattr(model, "is_ml_model", False):
+            logger.info("Using predict_df (ML model)")
+            return model.predict_df(df[feature_names])
+
+        # Baseline models → row-by-row evaluation
         logger.info("Using predict() row-by-row (baseline model)")
         scores = []
         for _, row in df.iterrows():
-            score = model.predict(
-                row["customer_id"],
-                [row["product"]],
-                None  # baseline ignores features
-            )[0]
-            scores.append(score)
+            scores.append(
+                model.predict(
+                    row["customer_id"],
+                    [row["product"]],
+                    None
+                )[0]
+            )
         return np.array(scores)
+
 
     # -------------------------------------
     # Metric computations

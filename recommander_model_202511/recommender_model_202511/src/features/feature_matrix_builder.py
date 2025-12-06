@@ -23,7 +23,7 @@ class FeatureMatrixBuilder:
         self.encoders = encoders  # {"segment":{}, "archetype":{}, "category":{}}
 
     # ------------------------------------------------------------
-    # SIZE + BASE PRODUCT FUNCTIONS (must match TrainingDataBuilder)
+    # SIZE + BASE PRODUCT FUNCTIONS
     # ------------------------------------------------------------
     def extract_size(self, product):
         p = product.lower()
@@ -67,7 +67,7 @@ class FeatureMatrixBuilder:
         }
 
     # ------------------------------------------------------------
-    # PAST FEATURE COMPUTATION (copied from TrainingDataBuilder)
+    # PAST FEATURES — identical to TrainingDataBuilder
     # ------------------------------------------------------------
     def compute_past_features(self, past_orders):
         past_products = set()
@@ -116,7 +116,7 @@ class FeatureMatrixBuilder:
         }
 
     # ------------------------------------------------------------
-    # TIME FEATURES (match training)
+    # TIME FEATURES (aligned with training)
     # ------------------------------------------------------------
     def compute_time_features(self, past_orders, now_order):
         if not past_orders:
@@ -135,23 +135,23 @@ class FeatureMatrixBuilder:
         }
 
     # ------------------------------------------------------------
-    # MASTER FEATURE BUILDER — ALIGNED 1:1 WITH TRAINING
+    # MASTER INFERENCE FEATURE BUILDER — 1:1 MATCH WITH TRAINING
     # ------------------------------------------------------------
     def build(self, customer_id):
         """
         Builds one row per product for this customer.
+        No labels, no order_idx — just feature matrix.
         """
 
         history = self.prepared.customer_histories.get(customer_id, [])
         order_idx = len(history)
-        past_orders = history  # all orders are past at inference time
+        past_orders = history
 
         pf = self.compute_past_features(past_orders)
 
-        # Dummy current order for time-based features
         now_order = {
             "order_date": past_orders[-1]["order_date"] if past_orders else pd.Timestamp("2024-01-01"),
-            "order_time": past_orders[-1].get("order_time", "12:00:00") if past_orders else "12:00:00"
+            "order_time": past_orders[-1].get("order_time", "12:00:00") if past_orders else "12:00:00",
         }
 
         tf = self.compute_time_features(past_orders, now_order)
@@ -159,8 +159,10 @@ class FeatureMatrixBuilder:
 
         rows = []
 
+        # Loop through ALL products the model knows
         for product in self.product_features.popularity.keys():
-            # History features
+
+            # ---- HISTORY FEATURES ----
             in_hist = product in pf["past_products"]
             hist_count = pf["past_product_counts"].get(product, 0)
             hist_freq = hist_count / max(pf["n_orders"], 1)
@@ -169,7 +171,7 @@ class FeatureMatrixBuilder:
             orders_since = order_idx - last_seen - 1 if last_seen >= 0 else 999
             time_decay = np.exp(-0.1 * orders_since) if in_hist else 0
 
-            # Category + size preferences
+            # ---- CATEGORY + SIZE ----
             category = self.category_map.get(product, "Unknown")
             cat_aff = pf["past_categories"].get(category, 0) / max(pf["total_items"], 1)
             is_pref_cat = int(category == pf["preferred_category"])
@@ -181,11 +183,10 @@ class FeatureMatrixBuilder:
             base = self.get_base_product(product)
             has_variant = int(pf["past_base_products"].get(base, 0) > 0)
 
-            # Global popularity
+            # ---- GLOBAL POPULARITY ----
             pop = self.product_features.popularity.get(product, 0)
             adj_pop = pop * (0.3 if orders_since > 3 and not in_hist else 1)
 
-            # Build row
             row = {
                 "customer_id": customer_id,
                 "product": product,
@@ -211,7 +212,7 @@ class FeatureMatrixBuilder:
                 # CUSTOMER FEATURES
                 **custf,
 
-                # PRODUCT GLOBAL FEATURES
+                # GLOBAL PRODUCT FEATURES
                 "popularity": pop,
                 "adjusted_popularity": adj_pop,
                 "category_encoded": self.encoders["category"].get(category, 0),

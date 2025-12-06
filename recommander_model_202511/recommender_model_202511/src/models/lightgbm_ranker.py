@@ -75,6 +75,7 @@ class LightGBMRanker(BaseRecommender):
         self.model = None
         self.feature_names: List[str] = []
         self._is_fitted = False
+        self.is_ml_model = True
 
         logger.info(f"{self.name} initialized (num_leaves={num_leaves}, lr={learning_rate})")
 
