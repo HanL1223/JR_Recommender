@@ -1,32 +1,89 @@
 """
-Product Feature Enginnering
+Product Feature Engineering
+===========================
+
+Computes product-level features:
+  1. Product popularity
+  2. Product–product co-occurrence (lift)
+  3. Category popularity
+
+Provides a ProductFeatures dataclass with a `to_row(product)` helper
+used by the RecommenderPredictor to build ML feature matrices.
 """
 
 import logging
 from abc import ABC, abstractmethod
 from collections import Counter, defaultdict
-from dataclasses import dataclass
-from typing import Dict, List
+from dataclasses import dataclass, asdict
+from typing import Dict
 
 from src.data_ingestion.data_preprocessor import PreparedData
 
 logger = logging.getLogger(__name__)
 
 
-
+# -----------------------------------------------------------------------------
+# PRODUCT FEATURES CONTAINER
+# -----------------------------------------------------------------------------
 @dataclass
 class ProductFeatures:
+    """
+    Container for product-level features.
+
+    popularity:          P(product) over all orders
+    cooccurrence:        nested dict of lift(product_i, product_j)
+    category_popularity: P(category) over all orders
+
+    `to_row(product)` converts these into a flat feature dict for ML models.
+    """
     popularity: Dict[str, float]
     cooccurrence: Dict[str, Dict[str, float]]
     category_popularity: Dict[str, float]
 
+    def to_dict(self) -> Dict:
+        """Return all features as a nested dictionary."""
+        return asdict(self)
 
+    def to_row(self, product: str) -> Dict[str, float]:
+        """
+        Return a flat feature dict for a single product, used by ML models.
+
+        This is what RecommenderPredictor expects when building its
+        feature matrix:
+
+            prod_dict = product_features.to_row(product)
+        """
+        # Base popularity
+        pop = self.popularity.get(product, 0.0)
+
+        # Co-occurrence: strength of best "also bought" partner
+        co_dict = self.cooccurrence.get(product, {})
+        top_co = max(co_dict.values()) if co_dict else 0.0
+
+        # Category popularity – if you later map products -> category,
+        # you can look up category_popularity here. For now, default to 0.
+        cat_pop = 0.0
+
+        return {
+            "product_popularity": pop,
+            "product_co_lift": top_co,
+            "category_popularity": cat_pop,
+        }
+
+
+# -----------------------------------------------------------------------------
+# BASE EXTRACTOR INTERFACE
+# -----------------------------------------------------------------------------
 class BaseProductFeatureExtractor(ABC):
-
     @abstractmethod
     def extract(self, prepared: PreparedData) -> ProductFeatures:
-        pass
+        """Return ProductFeatures from PreparedData."""
+        raise NotImplementedError
 
+
+# -----------------------------------------------------------------------------
+# MAIN EXTRACTOR IMPLEMENTATION
+# -----------------------------------------------------------------------------
 class ProductFeatureExtractor(BaseProductFeatureExtractor):
     """
     Computes:
@@ -37,68 +94,50 @@ class ProductFeatureExtractor(BaseProductFeatureExtractor):
 
     def __init__(self, min_support: float = 0.001):
         self.min_support = min_support
-        logger.info(f"ProductFeatureExtractor initialised (min_support={min_support})")
+        logger.info(
+            "ProductFeatureExtractor initialised (min_support=%s)",
+            min_support,
+        )
 
-    def compute_popularity(self,prepared:PreparedData)  -> Dict[str, float]:
-        """Compute product popularity as fraction of orders containing product."""
+    # -------------------------------------------------------------------------
+    # POPULARITY
+    # -------------------------------------------------------------------------
+    def compute_popularity(self, prepared: PreparedData) -> Dict[str, float]:
+        """
+        Compute product popularity as fraction of orders containing product.
+
+        P(product) = (# orders containing product) / (total # orders)
+        """
         counts = Counter()
         total_orders = 0
 
         for orders in prepared.customer_histories.values():
             for order in orders:
-                for p in order['basket']:
-                    if isinstance (p,str):
-                        counts[p] += 1
-                    total_orders += 1
-        return {p: round(c / total_orders ,5) for p, c in counts.items()}
-    
-    def compute_cooccurrence(self,prepared:PreparedData)  -> Dict[str, Dict[str, float]]:
-        """Compute product co-occurrence (lift).
-        Example
-        prepared.customer_histories = {
-            "customer_1": [
-                {"basket": ["bread", "butter", "milk"]},
-                {"basket": ["bread", "jam"]}
-            ],
-            "customer_2": [
-                {"basket": ["bread", "butter"]},
-            ],
-            "customer_3": [
-                {"basket": ["milk", "cookies"]}
-            ]
-        }
+                basket = [p for p in order.get("basket", []) if isinstance(p, str)]
+                if not basket:
+                    continue
+                counts.update(set(basket))  # order-level presence
+                total_orders += 1          # count this order once
 
-        self.min_support = 0.25  # Product must appear in 25% of orders
-        # Individual frequencies
-        p1_freq = 3/4 = 0.75  # bread appears in 75% of orders
-        p2_freq = 2/4 = 0.50  # butter appears in 50% of orders
+        if total_orders == 0:
+            return {}
 
-        # Joint frequency
-        joint = 2/4 = 0.50    # they appear together in 50% of orders
+        return {p: round(c / total_orders, 5) for p, c in counts.items()}
 
-        # Lift calculation
-        expected_joint = 0.75 × 0.50 = 0.375  # if independent
-        lift = 0.50 / 0.375 = 1.333
+    # -------------------------------------------------------------------------
+    # COOCCURRENCE (LIFT)
+    # -------------------------------------------------------------------------
+    def compute_cooccurrence(self, prepared: PreparedData) -> Dict[str, Dict[str, float]]:
+        """
+        Compute product co-occurrence (lift).
 
-        # Since lift > 1, these products are positively associated!
+        For each pair (p1, p2):
 
-        {
-        "bread": {
-            "butter": 1.333,
-            "milk": 0.667  # Would be filtered out (lift < 1)
-        },
-        "butter": {
-            "bread": 1.333,
-            "milk": 1.333
-        },
-        "milk": {
-            "butter": 1.333
-        }
-    }
-        Lift = 1.333 for (bread, butter): These products appear together 33% more often than random chance would predict
-        Lift < 1: Products appear together less than expected (negative correlation)
-        Lift = 1: Products are independent (no association)
-        
+            lift(p1, p2) = P(p1 & p2) / (P(p1) * P(p2))
+
+        Only keep pairs where:
+            - each product's frequency >= min_support
+            - lift > 1  (positive association)
         """
         pair_counts = defaultdict(Counter)
         single_counts = Counter()
@@ -106,7 +145,10 @@ class ProductFeatureExtractor(BaseProductFeatureExtractor):
 
         for orders in prepared.customer_histories.values():
             for order in orders:
-                basket = [p for p in set(order["basket"]) if isinstance(p, str)] 
+                basket = [p for p in set(order.get("basket", [])) if isinstance(p, str)]
+                if not basket:
+                    continue
+
                 single_counts.update(basket)
                 total_orders += 1
 
@@ -115,40 +157,60 @@ class ProductFeatureExtractor(BaseProductFeatureExtractor):
                         pair_counts[p1][p2] += 1
                         pair_counts[p2][p1] += 1
 
-        cooccurrence = {}
+        cooccurrence: Dict[str, Dict[str, float]] = {}
+        if total_orders == 0:
+            return cooccurrence
 
         for p1, pairs in pair_counts.items():
             p1_freq = single_counts[p1] / total_orders
             if p1_freq < self.min_support:
                 continue
 
-            cooccurrence[p1] = {}
             for p2, count in pairs.items():
                 p2_freq = single_counts[p2] / total_orders
-                joint = count / total_orders
+                if p2_freq < self.min_support:
+                    continue
 
-                if p2_freq >= self.min_support:
-                    lift = joint / (p1_freq * p2_freq)
-                    if lift > 1:
-                        cooccurrence[p1][p2] = round(lift, 3)
+                joint = count / total_orders
+                expected_joint = p1_freq * p2_freq
+                if expected_joint <= 0:
+                    continue
+
+                lift = joint / expected_joint
+
+                if lift > 1:  # positive association only
+                    cooccurrence.setdefault(p1, {})[p2] = round(lift, 3)
 
         return cooccurrence
-    
+
+    # -------------------------------------------------------------------------
+    # CATEGORY POPULARITY
+    # -------------------------------------------------------------------------
     def compute_category_popularity(self, prepared: PreparedData) -> Dict[str, float]:
-        """Compute popularity of categories."""
+        """
+        Compute popularity of categories, if present in each order.
+
+        P(category) = (# orders containing category) / (total # orders)
+        """
         counts = Counter()
         total_orders = 0
 
         for orders in prepared.customer_histories.values():
             for order in orders:
-                if "categories" in order:
-                    for c in order["categories"]:
-                        if isinstance(c, str):
-                            counts[c] += 1
+                cats = [c for c in order.get("categories", []) if isinstance(c, str)]
+                if not cats:
+                    continue
+                counts.update(set(cats))
                 total_orders += 1
 
-        return {c: cnt / total_orders for c, cnt in counts.items()} if counts else {}
-    
+        if total_orders == 0 or not counts:
+            return {}
+
+        return {c: cnt / total_orders for c, cnt in counts.items()}
+
+    # -------------------------------------------------------------------------
+    # MAIN ENTRYPOINT
+    # -------------------------------------------------------------------------
     def extract(self, prepared: PreparedData) -> ProductFeatures:
         logger.info("Extracting product features")
 
@@ -156,22 +218,25 @@ class ProductFeatureExtractor(BaseProductFeatureExtractor):
         cooccurrence = self.compute_cooccurrence(prepared)
         category_popularity = self.compute_category_popularity(prepared)
 
-        # Logging top 5 products
+        # Logging top 5 products by popularity
         if popularity:
             top_5 = sorted(popularity.items(), key=lambda x: -x[1])[:5]
             logger.info("Top 5 products:")
             for rank, (prod, score) in enumerate(top_5, 1):
-                logger.info(f"  {rank}. {prod} ({score:.2%})")
+                logger.info("  %d. %s (%.2f%%)", rank, prod, score * 100)
 
         logger.info(
-            f"Computed {sum(len(v) for v in cooccurrence.values()):,} co-occurrence pairs"
+            "Computed %s co-occurrence pairs",
+            f"{sum(len(v) for v in cooccurrence.values()):,}",
         )
 
         return ProductFeatures(
             popularity=popularity,
             cooccurrence=cooccurrence,
-            category_popularity=category_popularity
-        ) 
+            category_popularity=category_popularity,
+        )
+
 
 if __name__ == "__main__":
-     pass
+    # Module is intended to be imported. No CLI behaviour.
+    pass
